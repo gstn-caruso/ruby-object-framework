@@ -15,6 +15,8 @@ require_relative "object_framework/http/router"
 require_relative "object_framework/http/presentation"
 require_relative "object_framework/http/io"
 require_relative "object_framework/http/server"
+require_relative "object_framework/protobuf"
+require_relative "object_framework/grpc/service"
 
 module ObjectFramework
   VERSION = "0.1.0"
