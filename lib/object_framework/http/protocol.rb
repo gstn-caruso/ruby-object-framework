@@ -200,6 +200,10 @@ module ObjectFramework
       def call(input, context:)
         @application.invoke(@operation, context:, **@parameters.normalize(input))
       end
+
+      def validate!
+        @application.validate_operation!(@operation)
+      end
     end
   end
 end

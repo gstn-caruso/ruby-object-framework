@@ -10,6 +10,10 @@ module ObjectFramework
       def call(input, context:)
         @application.invoke(@operation, context:, **input)
       end
+
+      def validate!
+        @application.validate_operation!(@operation)
+      end
     end
 
     class StatusPresenter
@@ -96,6 +100,7 @@ module ObjectFramework
           service.methods.each_value do |method|
             controller = @controllers.fetch(method.controller) { raise ConfigurationError, "Missing RPC controller" }
             raise ConfigurationError, "RPC controllers must implement call" unless controller.respond_to?(:call)
+            controller.validate! if controller.respond_to?(:validate!)
             path = "/#{service.name}/#{method.name}"
             raise ConfigurationError, "Duplicate RPC route" if @routes.key?(path)
             @routes[path] = method

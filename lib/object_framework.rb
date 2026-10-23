@@ -27,4 +27,5 @@ require_relative "object_framework/grpc/server"
 module ObjectFramework
   VERSION = "0.1.0"
   autoload :SQLite, File.expand_path("object_framework/sqlite", __dir__)
+  autoload :Capabilities, File.expand_path("object_framework/capabilities", __dir__)
 end

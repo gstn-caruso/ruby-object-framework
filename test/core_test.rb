@@ -163,3 +163,17 @@ Spec.test "reserved execution dependencies cannot be shadowed by factories" do
     assert_raises(ObjectFramework::ConfigurationError) { app.factory(name) { Object.new } }
   end
 end
+
+Spec.test "startup validates use-case protocols and controller operation bindings" do
+  app = ObjectFramework::Application.new
+  app.operation(:invalid, use_case: Class.new, policy: :none)
+  assert_raises(ObjectFramework::ConfigurationError) { app.start }
+  app = ObjectFramework::Application.new
+  router = ObjectFramework::HTTP::Router.new
+  router.controller(:missing, ObjectFramework::HTTP::Controller.new(application: app, operation: :missing))
+  router.route("GET", "/", controller: :missing)
+  server = ObjectFramework::HTTP::Server.new(application: app, router:)
+  app.install(server)
+  assert_raises(ObjectFramework::ConfigurationError) { app.start }
+  assert_equal 0, server.port
+end

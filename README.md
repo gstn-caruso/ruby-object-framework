@@ -190,3 +190,20 @@ failure after a stream has produced values. Protocol references are
 [HTTP/2](https://www.rfc-editor.org/rfc/rfc9113.html),
 [HPACK](https://www.rfc-editor.org/rfc/rfc7541.html), and the
 [gRPC wire protocol](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md).
+
+## Optional Ruby capabilities
+
+`ObjectFramework::Capabilities::Definitions` wraps Ruby Box. Start Ruby with
+`RUBY_BOX=1`; enabling the variable later cannot change the running VM.
+Separate instances load their own application definitions. Ruby Box remains
+experimental, so the ordinary composition path does not require it.
+
+`Capabilities::IsolatedTask.new(task: YourTask)` runs a class/module's
+`self.call(input)` in a new Ractor. Inputs and results are independent values;
+sessions and execution contexts stay on the owning request thread. Tasks should
+be bounded computations over values. Cancellation is checked before and after
+the isolated task; it does not forcibly terminate a running Ractor.
+
+`ruby benchmark/compare.rb 20000 3` compares interpreter, YJIT, and ZJIT in
+separate processes. See [the benchmark notes](benchmark/README.md) for the
+workload, raw results, and limits of the comparison.

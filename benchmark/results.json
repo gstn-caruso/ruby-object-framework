@@ -1,0 +1,97 @@
+{
+  "ruby": "ruby 4.0.8 (2026-10-22 revision 60c3d71bfb) +PRISM [x86_64-linux]",
+  "measured_at": "2026-10-23T02:35:00Z",
+  "workload": "Scoped, detached application invocations; 2000 warmup calls per process",
+  "results": [
+    {
+      "mode": "interpreter",
+      "median_seconds": 0.09066760499263182,
+      "samples": [
+        {
+          "ruby": "4.0.8",
+          "mode": "interpreter",
+          "iterations": 20000,
+          "seconds": 0.09285463899141178,
+          "allocated_objects": 640012,
+          "checksum": 2666466690000
+        },
+        {
+          "ruby": "4.0.8",
+          "mode": "interpreter",
+          "iterations": 20000,
+          "seconds": 0.09066760499263182,
+          "allocated_objects": 640012,
+          "checksum": 2666466690000
+        },
+        {
+          "ruby": "4.0.8",
+          "mode": "interpreter",
+          "iterations": 20000,
+          "seconds": 0.08972096600336954,
+          "allocated_objects": 640012,
+          "checksum": 2666466690000
+        }
+      ]
+    },
+    {
+      "mode": "yjit",
+      "median_seconds": 0.04979296601959504,
+      "samples": [
+        {
+          "ruby": "4.0.8",
+          "mode": "yjit",
+          "iterations": 20000,
+          "seconds": 0.049107433995231986,
+          "allocated_objects": 640009,
+          "checksum": 2666466690000
+        },
+        {
+          "ruby": "4.0.8",
+          "mode": "yjit",
+          "iterations": 20000,
+          "seconds": 0.05495792601141147,
+          "allocated_objects": 640009,
+          "checksum": 2666466690000
+        },
+        {
+          "ruby": "4.0.8",
+          "mode": "yjit",
+          "iterations": 20000,
+          "seconds": 0.04979296601959504,
+          "allocated_objects": 640009,
+          "checksum": 2666466690000
+        }
+      ]
+    },
+    {
+      "mode": "zjit",
+      "median_seconds": 0.061344451998593286,
+      "samples": [
+        {
+          "ruby": "4.0.8",
+          "mode": "zjit",
+          "iterations": 20000,
+          "seconds": 0.06346447902615182,
+          "allocated_objects": 640012,
+          "checksum": 2666466690000
+        },
+        {
+          "ruby": "4.0.8",
+          "mode": "zjit",
+          "iterations": 20000,
+          "seconds": 0.061344451998593286,
+          "allocated_objects": 640012,
+          "checksum": 2666466690000
+        },
+        {
+          "ruby": "4.0.8",
+          "mode": "zjit",
+          "iterations": 20000,
+          "seconds": 0.060369924001861364,
+          "allocated_objects": 640012,
+          "checksum": 2666466690000
+        }
+      ]
+    }
+  ]
+}

@@ -82,6 +82,14 @@ module ObjectFramework
                      mappings: @mappings).call(context:, **arguments)
     end
 
+    def validate_operation!(name)
+      operation = @operations.fetch(name) { raise ConfigurationError, "Unknown operation: #{name}" }
+      unless operation.use_case.is_a?(Class) && operation.use_case.public_instance_methods.include?(:call)
+        raise ConfigurationError, "Use cases must be classes implementing call"
+      end
+      operation
+    end
+
     private
 
     def mutable!
@@ -91,7 +99,8 @@ module ObjectFramework
     def validate!
       @mappings&.validate!
       @factories.each_key { |name| validate_dependency(name, []) }
-      @operations.each_value do |operation|
+      @operations.each do |name, operation|
+        validate_operation!(name)
         if operation.policy != :none && !@storage
           raise ConfigurationError, "Transactional operations require storage"
         end

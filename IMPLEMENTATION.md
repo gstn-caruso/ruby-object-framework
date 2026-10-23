@@ -11,7 +11,7 @@ scenarios before work starts on the next delivery.
 | 3 | HTTP/1.1 server, TLS, JSON, order confirmation example | Passed: 61 cumulative scenarios on Ruby 4.0.8 |
 | 4 | SQLite adapter, migrations, shared storage contract | Passed: 75 cumulative scenarios on Ruby 4.0.8 |
 | 5 | HTTP/2, HPACK, Protocol Buffers, gRPC and streaming interoperability | Passed: 93 cumulative scenarios on Ruby 4.0.8 |
-| 6 | Optional Ruby Box, Ractor, interpreter/YJIT/ZJIT comparison | In progress |
+| 6 | Optional Ruby Box, Ractor, interpreter/YJIT/ZJIT comparison | Passed: 97 cumulative scenarios on Ruby 4.0.8 |
 
 ## Development
 
@@ -54,3 +54,8 @@ of the live site are required deliverables. This documentation work is pending.
   stream errors, admission across connections, cancellation, and per-message
   commits surviving a late stream error. RFC HPACK tables and their license are
   documented in `THIRD_PARTY_NOTICES.md`.
+- Delivery 6: `ruby -Ilib:test test/run.rb` — 97 tests, zero failures.
+  Ruby Box isolation is tested in a process booted with `RUBY_BOX=1`. Ractor
+  tasks accept independent values and return to the owning request thread.
+  `ruby benchmark/compare.rb 20000 3` verified matching results in interpreter,
+  YJIT, and ZJIT processes; raw measurements are in `benchmark/results.json`.

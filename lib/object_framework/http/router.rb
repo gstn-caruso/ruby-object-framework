@@ -41,6 +41,7 @@ module ObjectFramework
         @routes.each do |route|
           controller = @controllers.fetch(route.controller) { raise ConfigurationError, "Unknown route controller" }
           raise ConfigurationError, "Controller must implement call" unless controller.respond_to?(:call)
+          controller.validate! if controller.respond_to?(:validate!)
         end
         @controllers.freeze
         @routes.sort_by! { |route| route.names.size } unless @routes.frozen?
