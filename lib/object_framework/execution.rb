@@ -2,6 +2,17 @@
 
 module ObjectFramework
   module Values
+    # Storage values are immutable; domain state receives its own editable copy.
+    def self.mutable_copy(value)
+      case value
+      when String then value.dup
+      when Array then value.map { |item| mutable_copy(item) }
+      when Hash then value.to_h { |key, item| [mutable_copy(key), mutable_copy(item)] }
+      when Data then value.class.new(**mutable_copy(value.to_h))
+      else value
+      end
+    end
+
     def self.detach(value, visiting = {})
       composite = value.is_a?(Array) || value.is_a?(Hash) || value.is_a?(Data)
       if composite

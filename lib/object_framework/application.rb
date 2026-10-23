@@ -7,8 +7,8 @@ module ObjectFramework
   class Application
     attr_reader :errors, :reporter
 
-    def initialize(storage: nil, errors: ErrorRegistry.new, reporter: nil)
-      @storage, @errors = storage, errors
+    def initialize(storage: nil, mappings: nil, errors: ErrorRegistry.new, reporter: nil)
+      @storage, @mappings, @errors = storage, mappings, errors
       @reporter = reporter || FailureReporter.new(registry: errors)
       @factories, @operations, @modules, @started_modules = {}, {}, {}, []
       @started, @finalized = false, false
@@ -89,27 +89,26 @@ module ObjectFramework
     end
 
     def validate!
+      @mappings&.validate!
       @factories.each_key { |name| validate_dependency(name, []) }
       @operations.each_value do |operation|
         if operation.policy != :none && !@storage
           raise ConfigurationError, "Transactional operations require storage"
         end
-        operation.dependencies.each do |name|
-          if %i[transaction session].include?(name)
-            raise ConfigurationError, "Storage dependency requires a transaction" if operation.policy == :none
-            raise ConfigurationError, "Session requires mappings" if name == :session && !@mappings
-          else
-            validate_dependency(name, [])
-          end
-        end
+        operation.dependencies.each { |name| validate_dependency(name, [], policy: operation.policy) }
       end
     end
 
-    def validate_dependency(name, visiting)
+    def validate_dependency(name, visiting, policy: nil)
       return if name == :context
+      if %i[session transaction].include?(name)
+        raise ConfigurationError, "Storage dependency requires a transaction" if policy == :none
+        raise ConfigurationError, "Session requires mappings" if name == :session && !@mappings
+        return
+      end
       raise ConfigurationError, "Dependency cycle: #{(visiting + [name]).join(' -> ')}" if visiting.include?(name)
       factory = @factories.fetch(name) { raise ConfigurationError, "Unknown dependency: #{name}" }
-      factory.dependencies.each { |dependency| validate_dependency(dependency, visiting + [name]) }
+      factory.dependencies.each { |dependency| validate_dependency(dependency, visiting + [name], policy:) }
     end
 
     def ordered_modules
