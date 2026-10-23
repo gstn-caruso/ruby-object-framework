@@ -22,7 +22,8 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '4.0.8'
-          bundler-cache: true
+      - name: Install the SQLite adapter dependency
+        run: gem install sqlite3 --version 2.10.1 --no-document
       - uses: actions/setup-python@v6
         with:
           python-version: '3.14'
