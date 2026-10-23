@@ -125,7 +125,11 @@ module ObjectFramework
       begin
         context.cancellation.check!
         if @operation.policy != :none
-          transaction = @storage.begin_transaction(mode: @operation.policy)
+          transaction = if @storage.respond_to?(:begin_transaction_for)
+            @storage.begin_transaction_for(mode: @operation.policy, context:)
+          else
+            @storage.begin_transaction(mode: @operation.policy)
+          end
           context.transaction_state = :active
           scope.provide(:transaction, transaction)
           if @mappings

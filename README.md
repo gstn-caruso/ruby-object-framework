@@ -87,3 +87,63 @@ Keep public APIs, tests, documentation, and explanatory comments in English.
 Start a behavior change with a failing scenario in the dependency-free runner,
 then implement it and run the current delivery gate. Comments explaining
 protocol constraints and non-obvious decisions are welcome.
+
+## HTTP order example
+
+```sh
+ruby -Ilib examples/orders/server.rb
+curl -X POST http://127.0.0.1:8080/orders/ready/confirm
+curl -X POST http://127.0.0.1:8080/orders/missing/confirm
+curl -X POST http://127.0.0.1:8080/orders/rejected/confirm
+```
+
+`ConfirmOrder` collaborates with an injected repository. `Order` owns its
+confirmation invariant. An external mapping describes persistence, and an HTTP
+controller normalizes path parameters before invoking the operation. The test
+suite also demonstrates a concurrent commit conflict and an unexpected storage
+failure. The example uses volatile in-memory storage.
+
+HTTP uses a dispatcher with `IO.select` and Fibers, then one new thread per
+admitted request. Admission defaults to 128 active requests. Keep-alive requests
+run sequentially on separate threads. Limits default to an 8 KiB request line,
+32 KiB header section, and 1 MiB body. Header timeout is 10 seconds; body,
+execution, write, and idle timeouts are 30 seconds. Execution cancellation is
+cooperative. `Server` accepts an application-configured OpenSSL `tls_context:`
+with a certificate and private key.
+
+The parser follows [RFC 9112](https://www.rfc-editor.org/rfc/rfc9112.html).
+Ambiguous framing closes the connection. Invalid JSON yields 400, invalid
+structure yields 422, missing routes yield 404, and wrong methods yield 405 with
+`Allow`. Errors use [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html)
+problem details; presentation and send failures preserve the transaction outcome.
+
+## SQLite
+
+Install the sole optional runtime gem with `bundle install` (or install `sqlite3`
+2.10.1 or newer in the 2.x series). Requiring `object_framework` does not load
+sqlite3 until `ObjectFramework::SQLite` is used.
+
+```ruby
+schema = ObjectFramework::SQLite::Schema.from_mappings(mappings)
+storage = ObjectFramework::SQLite::Storage.new(path: "orders.sqlite3", schema:)
+app = ObjectFramework::Application.new(storage:, mappings:)
+```
+
+Each invocation owns one SQLite connection. Foreign keys are enabled, journal
+mode is DELETE, and synchronization is FULL. Writes use IMMEDIATE transactions;
+reads use DEFERRED transactions. Lock waiting respects the execution deadline
+and a configurable `lock_timeout:` (one second by default). Writes have no
+automatic application-level retries. SQL values are bound parameters; table
+and column names must belong to the declared schema.
+
+Schema version 1 creates the declared tables. Add consecutive versions before
+constructing the storage:
+
+```ruby
+schema.migration(2) { add_column :orders, :note, type: :string }
+```
+
+Migrations run in a transaction and use SQLite's `user_version`. Startup rejects
+newer database versions and mismatched column declarations. DELETE journaling
+can delay a writer's commit while a reader remains active; keep invocations
+short. Call `storage.close` after stopping applications that use it.

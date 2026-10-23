@@ -8,9 +8,9 @@ scenarios before work starts on the next delivery.
 | --- | --- | --- |
 | 1 | Composition, invocation, errors, cancellation, diagnostics | Passed: 19 scenarios on Ruby 4.0.8 |
 | 2 | Data Mapper, queries, associations, snapshot HashMap storage | Passed: 35 cumulative scenarios on Ruby 4.0.8 |
-| 3 | HTTP/1.1 server, TLS, JSON, order confirmation example | In progress |
-| 4 | SQLite adapter, migrations, shared storage contract | Pending |
-| 5 | HTTP/2, HPACK, Protocol Buffers, gRPC and streaming interoperability | Pending |
+| 3 | HTTP/1.1 server, TLS, JSON, order confirmation example | Passed: 61 cumulative scenarios on Ruby 4.0.8 |
+| 4 | SQLite adapter, migrations, shared storage contract | Passed: 75 cumulative scenarios on Ruby 4.0.8 |
+| 5 | HTTP/2, HPACK, Protocol Buffers, gRPC and streaming interoperability | In progress |
 | 6 | Optional Ruby Box, Ractor, interpreter/YJIT/ZJIT comparison | Pending |
 
 ## Development
@@ -30,3 +30,15 @@ adapter may additionally depend on `sqlite3`; no other runtime gems are planned.
 - Delivery 2: `ruby -Ilib:test test/run.rb` — 35 tests, zero failures.
   Includes the shared storage contract, eight concurrent writers, mutable
   domain-field isolation, removed-entity visibility, and immutable identities.
+- Delivery 3: `ruby -Ilib:test test/run.rb` — 61 tests, zero failures.
+  Includes raw-socket fragmentation and pipelining, chunked framing, admission,
+  deadlines, TLS, Net::HTTP interoperability, late failures, and all five order
+  confirmation outcomes. Start the example with
+  `ruby -Ilib examples/orders/server.rb`.
+- Delivery 4: `ruby -Ilib:test test/run.rb` — 75 tests, zero failures, with
+  sqlite3 2.10.1 and SQLite 3.54.1. Both adapters run the same storage contract.
+  SQLite DELETE journaling holds a writer's commit behind active readers; the
+  common contract checks visibility before ending the reader, then commits the
+  writer. A separate HashMap scenario preserves the stronger concurrent-commit
+  snapshot assertion. Tests also cover deadline-bounded locks, safe SQL binding,
+  schema versions and shape validation, foreign keys, and per-invocation cleanup.

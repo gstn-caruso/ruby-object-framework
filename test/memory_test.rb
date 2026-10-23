@@ -5,6 +5,19 @@ require_relative "support/storage_contract"
 
 StorageContract.register("HashMap") { ObjectFramework::Memory::Storage.new }
 
+Spec.test "HashMap readers retain their snapshot after another transaction commits" do
+  storage = ObjectFramework::Memory::Storage.new
+  reader = storage.begin_transaction(mode: :read)
+  assert_equal [], reader.query(ObjectFramework::Persistence::Query.new(table: :records))
+  writer = storage.begin_transaction(mode: :write)
+  writer.insert(:records, { id: "committed" })
+  writer.commit
+  assert_equal [], reader.query(ObjectFramework::Persistence::Query.new(table: :records))
+ensure
+  [reader, writer].compact.each(&:close)
+  storage&.close
+end
+
 Spec.test "HashMap rejects stale writers without publishing any partial changes" do
   storage = ObjectFramework::Memory::Storage.new
   first = storage.begin_transaction(mode: :write)

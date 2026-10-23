@@ -18,4 +18,5 @@ require_relative "object_framework/http/server"
 
 module ObjectFramework
   VERSION = "0.1.0"
+  autoload :SQLite, File.expand_path("object_framework/sqlite", __dir__)
 end

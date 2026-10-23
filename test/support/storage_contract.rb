@@ -21,18 +21,18 @@ module StorageContract
       storage&.close
     end
 
-    Spec.test "#{name}: commits are atomic and readers retain their snapshot" do
+    Spec.test "#{name}: commits are atomic and readers cannot see private writes" do
       storage = build.call
       reader = storage.begin_transaction(mode: :read)
       assert_equal [], reader.query(ObjectFramework::Persistence::Query.new(table: :records))
       writer = storage.begin_transaction(mode: :write)
       writer.insert(:records, { id: "one", name: "A", total: 1 })
       writer.insert(:records, { id: "two", name: "B", total: 2 })
-      writer.commit
-      writer.close
       assert_equal [], reader.query(ObjectFramework::Persistence::Query.new(table: :records))
       reader.commit
       reader.close
+      writer.commit
+      writer.close
       fresh = storage.begin_transaction(mode: :read)
       assert_equal 2, fresh.query(ObjectFramework::Persistence::Query.new(table: :records)).size
       fresh.close
