@@ -122,7 +122,7 @@ Spec.test "cancellation and deadlines are cooperative and use monotonic time" do
 end
 
 Spec.test "public values are detached and immutable before resources are closed" do
-  source = { "items" => ["original"] }
+  source = { "items" => [+"original"] }
   use_case = Class.new do
     def initialize(source:); @source = source; end
     def call; @source; end
