@@ -1,37 +1,53 @@
 # Guides design and editorial brief
 
 Readers are Ruby developers building applications from collaborating objects.
-The site should work as a course and as a reference book. Each guide connects
-a runnable example to the responsibility, invariant, and tradeoff behind it.
+The site works as a course and as a reference book. Each guide connects a
+runnable example to the responsibility, invariant, and tradeoff behind it.
 
-The palette uses paper white `#ffffff`, navy `#17334a`, body ink `#243746`,
-Ruby red `#a5213c`, pale blue `#edf3f7`, and a quiet rule `#cbd7df`. Georgia is
-the reading face; Trebuchet MS and system sans-serif provide navigation and
-headings. Code uses the platform monospace stack. No external font request is
-required. Body text stays near 70 characters per line.
+The user requested the visual style of
+[the Rails Guides index](https://guides.rubyonrails.org/index.html), as well as
+its progressive teaching and explicit examples. The reference was inspected
+on October 23, 2026. The stylesheet implements that appearance for the
+ObjectFramework content and navigation.
 
-The desktop layout places the ordered learning path beside a readable article,
-with an in-page contents list in the right margin. On small screens, native
-disclosure controls collapse navigation and contents. Text stays left aligned.
+## Visual treatment
+
+Use a white page, a white header, red `#c81418` headings and links, near-black
+`#222222` body text, warm gray `#faf9f8` secondary surfaces, and fine gray
+`#a9a9a8` rules between guide descriptions. The desktop reading column starts
+near the left margin, while chapter navigation occupies the right margin.
+The header contains a circular project symbol, the guide title and version,
+a Guides Index disclosure, source, and contribution links.
+
+Body text uses Inter at 16 pixels with a 1.4 line height. Headings are bold
+sans serif, with red page titles and article chapter titles. Rails uses
+Calibre for headings; this site uses locally installed Calibre when present
+and the bundled open-font Inter otherwise. Code uses the same IBM Plex Mono
+family as the reference, on dark warm-gray blocks with pale syntax colors.
+Inter and IBM Plex Mono are self-hosted with their SIL Open Font Licenses;
+no third-party font request is required.
+
+The index uses section headings and ruled definition lists. Cyan and pale
+yellow notes explain the reading path and executable examples in the right
+margin. Article pages use a numbered chapter index there instead.
 
 ```text
-ObjectFramework                 Guides / Source
-------------------------------------------------
-Learning path | Guide title        | On this page
-              | Goals / prerequisites
-              | Working example
-              | Explanation and decisions
-              | Failure cases
-              | Next step
+Project symbol / Guides / Version          Guides Index / Contribute
+
+Guide title and introduction               Chapters
+                                            1. First concept
+1. First concept                            2. Next concept
+Working example and explanation
 ```
 
-The index groups guides by the learning task and describes what each makes
-possible. It uses a list of chapters, not repeated promotional panels. The
-strong visual choice is the combination of a book-like reading column and a
-visible path through object responsibilities. Code, diagrams, and explanations
-carry the page; ornamental motion and generic marketing sections are omitted.
+Below 1025 pixels, the header stacks, the article uses the available width,
+and a native disclosure places chapter navigation before the article. The
+Guides Index remains keyboard accessible at every width. A dark color scheme
+follows the reference's dark surfaces and softer red links. Print styles
+remove navigation while preserving the article.
 
-This brief was checked against the user's clarification: Rails Guides is a
-reference for progression, explicit examples, and depth of explanation. Its
-branding, wording, and layout are not copied. The visual treatment serves that
-editorial objective and must remain readable with JavaScript disabled.
+ObjectFramework retains its own name, symbol, original explanations, and
+executable examples. The stylesheet is maintained with the repository rather
+than loading the Rails site's stylesheet at runtime. Validate generated links,
+review desktop and mobile screenshots, exercise the disclosure and search with
+a keyboard, and audit the rendered guide after visual changes.

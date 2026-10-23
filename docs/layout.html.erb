@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="<%= h(guide ? guide.summary : 'Progressive guides to building Ruby applications from collaborating objects.') %>">
   <title><%= guide ? "#{h(guide.title)} · " : '' %>ObjectFramework Guides</title>
+  <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/styles.css">
   <link rel="icon" href="assets/objects.svg" type="image/svg+xml">
   <script src="assets/guides.js" defer></script>
@@ -13,14 +14,11 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="index.html"><img src="assets/objects.svg" width="34" height="34" alt=""><span>ObjectFramework <b>Guides</b></span></a>
-      <nav aria-label="Project"><a href="<%= h(@repository) %>">Source on GitHub</a><span>Ruby 4.0.8</span></nav>
-    </div>
-  </header>
-  <div class="book-layout <%= guide ? 'article-layout' : 'index-layout' %>">
-    <aside class="learning-path">
-      <details class="path-disclosure" open>
-        <summary>Learning path</summary>
+      <div class="header-brand"><a class="brand" href="index.html"><img src="assets/objects.svg" width="75" height="75" alt=""><span>ObjectFramework <b>Guides</b></span></a><span class="edition">Version: 0.1.0</span></div>
+      <nav class="project-links" aria-label="Project"><a href="<%= h(@repository) %>">Source on GitHub</a>
+      <details class="path-disclosure">
+        <summary>Guides Index</summary>
+        <div class="guide-menu">
         <nav aria-label="Guides">
           <label class="search-label" for="guide-search">Find a guide</label>
           <input id="guide-search" type="search" placeholder="Topic or guide title" autocomplete="off">
@@ -31,12 +29,14 @@
           </ol>
           <p class="search-status" aria-live="polite"></p>
         </nav>
+        </div>
       </details>
-      <p class="edition">Framework 0.1.0<br>From first use case to streaming</p>
-    </aside>
+      <a href="<%= h(@repository) %>/blob/main/docs/README.md">Contribute</a></nav>
+    </div>
+  </header>
+  <div class="book-layout <%= guide ? 'article-layout' : 'index-layout' %>">
     <main id="main" tabindex="-1">
       <% if guide -%>
-        <p class="breadcrumb"><a href="index.html">All guides</a> / <%= h(guide.section) %></p>
         <h1><%= h(guide.title) %></h1>
         <p class="guide-summary"><%= h(guide.summary) %></p>
         <details class="mobile-contents"><summary>On this page</summary><ol><% headings.each do |heading| %><li><a href="#<%= heading[:id] %>"><%= h(heading[:text]) %></a></li><% end %></ol></details>
@@ -51,7 +51,12 @@
       <% end -%>
     </main>
     <% if guide -%>
-      <aside class="contents"><nav aria-label="On this page"><h2>On this page</h2><ol><% headings.each do |heading| %><li class="level-<%= heading[:level] %>"><a href="#<%= heading[:id] %>"><%= h(heading[:text]) %></a></li><% end %></ol></nav></aside>
+      <aside class="contents"><nav aria-label="On this page"><h2>Chapters</h2><ol><% headings.each do |heading| %><li class="level-<%= heading[:level] %>"><a href="#<%= heading[:id] %>"><%= h(heading[:text]) %></a></li><% end %></ol></nav></aside>
+    <% else -%>
+      <aside class="index-notes" aria-label="About these guides">
+        <div class="guide-note"><p>Start with <a href="<%= @guides.first.slug %>.html">your first application</a>, then follow the guides in order.</p></div>
+        <div class="guide-note example-note"><p>Full examples are executable Ruby programs. Their documented output is checked in the framework's test suite.</p></div>
+      </aside>
     <% end -%>
   </div>
   <footer class="site-footer"><p>ObjectFramework is an open-source Ruby framework. These guides explain its public APIs, the objects behind them, and their tradeoffs.</p><a href="<%= h(@repository) %>/blob/main/PLAN.md">Design and delivery plan</a><a href="#main">Back to content</a></footer>

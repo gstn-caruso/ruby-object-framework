@@ -41,6 +41,12 @@ objects-and-responsibilities guide passed all 55 Lighthouse checks, scoring
 cover the inspected page and do not measure performance or prove accessibility
 for every possible reader.
 
+The visual revision requested after publication follows the Rails Guides index:
+white header, red typography and links, right-hand chapters, ruled index entries,
+dark code blocks, and responsive navigation. Inter and IBM Plex Mono are bundled
+with their font licenses. The revised layout passed desktop, mobile, dark-mode,
+keyboard disclosure/search, and 55 mobile Lighthouse checks locally.
+
 ## Verified delivery gates
 
 - Delivery 1: `ruby -Ilib:test test/run.rb` — 19 tests, zero failures.

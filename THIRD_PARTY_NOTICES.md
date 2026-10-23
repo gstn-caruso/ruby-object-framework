@@ -1,4 +1,21 @@
-# Third-party protocol data
+# Third-party notices
+
+## Documentation fonts
+
+The guides self-host Inter and IBM Plex Mono under the SIL Open Font License
+1.1. Their copyright notices and complete licenses are distributed alongside
+the font files in `docs/assets/fonts/Inter-LICENSE.txt` and
+`docs/assets/fonts/Plex-LICENSE.txt`.
+
+- Inter: https://github.com/rsms/inter, revision
+  `353b61b9f4430d5f420d56605a6e7993e0941470`.
+- IBM Plex: https://github.com/IBM/plex, revision
+  `71f558992315a12ca1f06a2215d57962a1992162`.
+
+The documentation stylesheet is an original implementation of the visual
+reference requested by the project: https://guides.rubyonrails.org/index.html.
+
+## Protocol data
 
 `lib/object_framework/http2/hpack_tables.rb` contains the static header table
 and Huffman code table from RFC 7541, Appendices A and B:

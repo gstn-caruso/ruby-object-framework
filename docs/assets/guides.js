@@ -1,5 +1,3 @@
-const path = document.querySelector('.path-disclosure');
-if (matchMedia('(max-width: 760px)').matches && path) path.open = false;
 const search = document.querySelector('#guide-search');
 search?.addEventListener('input', () => {
   const query = search.value.trim().toLowerCase();

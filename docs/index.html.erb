@@ -1,9 +1,6 @@
 <section class="introduction">
-  <h1>ObjectFramework Guides</h1>
-  <p class="guide-summary">Build an application, one collaboration at a time.</p>
-  <p>Start with a plain Ruby use case. Grow it into an order-confirmation application, give its objects a transaction, and expose the same intention through HTTP and gRPC.</p>
-  <p>Each guide includes runnable examples, failure cases, and the reasoning behind the design. Follow the learning path in order, or enter at the topic you need.</p>
-  <a class="start-reading" href="<%= @guides.first.slug %>.html">Start with your first application</a>
+  <h1>ObjectFramework Guides <span>(v0.1.0)</span></h1>
+  <p>These guides teach you to build Ruby applications from collaborating objects. Start with a plain use case, grow it into an order-confirmation application, and understand how its objects, transactions, HTTP, and gRPC fit together.</p>
 </section>
 <div class="guide-index">
   <% @guides.group_by(&:section).each do |section, entries| -%>

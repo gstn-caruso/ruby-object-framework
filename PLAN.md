@@ -290,9 +290,11 @@ example state assumed rather than silently depend on earlier steps.
 - Make long explanations and code comfortable to read on desktop and mobile,
   with semantic HTML, keyboard navigation, visible focus, and sufficient
   contrast.
-- Give the site its own restrained presentation. The Rails Guides reference
-  governs the teaching depth and progression; it does not require copying
-  Rails branding or content.
+- Match the visual style of https://guides.rubyonrails.org/index.html:
+  a white header, red headings and links, sans-serif reading text, a broad
+  left content column, a right-hand chapter index, ruled guide listings,
+  dark code blocks, and responsive navigation. Preserve ObjectFramework's
+  name, identity, and original guide content.
 - Provide documented local build and preview commands, and support the project
   path used by GitHub Pages without broken assets or links.
 - Publish through a reproducible GitHub Actions workflow, with tests and guide
