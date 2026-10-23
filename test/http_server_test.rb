@@ -222,3 +222,30 @@ Spec.test "HTTP closes the connection when response sending fails after bytes we
     client&.close
   end
 end
+
+Spec.test "HTTP interoperates with the independent standard-library Net::HTTP client" do
+  require "net/http"
+  with_http do |app, server|
+    http = Net::HTTP.new("127.0.0.1", server.port, nil)
+    response = http.get("/items/independent")
+    assert_equal "200", response.code
+    assert_equal "independent", JSON.parse(response.body)["id"]
+  end
+end
+
+Spec.test "HTTP rejects TLS configuration without application certificates before binding" do
+  assert_raises(ObjectFramework::ConfigurationError) do
+    with_http(tls_context: OpenSSL::SSL::SSLContext.new) { raise "Unexpected listener" }
+  end
+end
+
+Spec.test "HTTP writers replace framing headers case-insensitively" do
+  bytes = +""
+  reader = Object.new
+  reader.define_singleton_method(:write) { |data, deadline:, &block| bytes << data; block.call(data.bytesize) }
+  response = ObjectFramework::HTTP::Response.new(status: 200, headers: { "content-length" => "999", "connection" => "close" }, body: "{}")
+  ObjectFramework::HTTP::Writer.new(reader:).call(response, deadline: ObjectFramework::HTTP::Timing.now + 1)
+  assert_equal 1, bytes.scan(/^content-length:/i).size
+  assert_equal 1, bytes.scan(/^connection:/i).size
+  assert bytes.include?("Content-Length: 2\r\n")
+end

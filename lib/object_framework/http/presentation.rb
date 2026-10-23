@@ -6,7 +6,18 @@ module ObjectFramework
 
     class JSONPresenter
       def call(value)
-        Response.new(status: 200, headers: { "Content-Type" => "application/json" }, body: JSON.generate(value))
+        Response.new(status: 200, headers: { "Content-Type" => "application/json" }, body: JSON.generate(json_value(value)))
+      end
+
+      private
+
+      def json_value(value)
+        case value
+        when Data then json_value(value.to_h)
+        when Hash then value.to_h { |key, item| [key, json_value(item)] }
+        when Array then value.map { |item| json_value(item) }
+        else value
+        end
       end
     end
 

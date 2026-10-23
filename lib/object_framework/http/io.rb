@@ -111,7 +111,8 @@ module ObjectFramework
       def call(response, head: false, keep_alive: true, deadline:)
         status, body = response.status, response.body
         raise InvalidInput, "Invalid response status" unless status.is_a?(Integer) && status.between?(200, 599)
-        headers = response.headers.merge("Date" => Time.now.httpdate, "Connection" => keep_alive ? "keep-alive" : "close")
+        headers = response.headers.reject { |name, _| %w[date connection content-length].include?(name.downcase) }
+        headers = headers.merge("Date" => Time.now.httpdate, "Connection" => keep_alive ? "keep-alive" : "close")
         headers["Content-Length"] = body.bytesize.to_s unless [204, 304].include?(status)
         headers.each do |name, value|
           raise InvalidInput, "Invalid response header" unless Parser::TOKEN.match?(name) && !value.to_s.match?(/[\x00-\x1f\x7f]/)

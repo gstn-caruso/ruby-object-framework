@@ -48,7 +48,10 @@ module ObjectFramework
         unless [@header_timeout, @body_timeout, @execution_timeout, @idle_timeout, @write_timeout, @shutdown_timeout].all? { |value| value.is_a?(Numeric) && value.positive? }
           raise ConfigurationError, "HTTP timeouts must be positive"
         end
-        @tls_context&.setup
+        if @tls_context
+          raise ConfigurationError, "TLS requires an application certificate and private key" unless @tls_context.cert && @tls_context.key
+          @tls_context.setup
+        end
       end
 
       def start
