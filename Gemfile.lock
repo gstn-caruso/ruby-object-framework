@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ruby-object-framework (1.0.0)
+    ruby-object-framework (1.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -51,7 +51,7 @@ CHECKSUMS
   erb (6.0.7)
   psych (5.3.1)
   rdoc (7.0.4)
-  ruby-object-framework (1.0.0)
+  ruby-object-framework (1.1.0)
   sqlite3 (2.10.1-aarch64-linux-gnu) sha256=48390cc2b809acd1280f5c9daaf3c2013833adb8a5ece9b0634f708651080ccd
   sqlite3 (2.10.1-aarch64-linux-musl) sha256=db1bcddf98e4eeea80ca896f56aa3f9468364fa1ee8e042ddc6b628b5092fabb
   sqlite3 (2.10.1-arm-linux-gnu) sha256=34a67a3fe84f705a0fad6f7aa4541579300644b9acdf414797e59929a6e3528b
