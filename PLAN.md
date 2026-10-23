@@ -205,4 +205,115 @@ Las pruebas utilizarán Ruby y un ejecutor pequeño propio. Los escenarios cubri
 
 El comando del ejecutor será `ruby -Ilib:test test/run.rb`, verificando primero Ruby 4.0.8. Cada entrega deberá pasar sus escenarios antes de comenzar la siguiente.
 
-El entregable actual es este plan completo, guardado en `/home/gaston/Code/ruby-object-framework/PLAN.md`. Las entregas de implementación y sus pruebas quedan descritas para el desarrollo posterior.
+The deliverables are the implemented framework, its passing delivery gates,
+executable examples, repository documentation, and the published guides described
+below. Implementation, tests, new documentation, and explanatory source comments
+use English. Comments explaining protocol constraints and design decisions are
+appropriate for this open-source framework.
+
+## 6. Progressive guides and GitHub Pages
+
+### Editorial objective
+
+Create documentation in the repository and publish it as a GitHub Pages site.
+Use Rails Guides as an editorial reference: progressive learning, explicit
+examples, and substantial explanations of why the framework works as it does.
+
+Each guide must help readers use the framework and understand its design. A
+catalog of APIs or short recipes alone does not meet this requirement. All guide
+content is original and written in English.
+
+### Learning progression
+
+Organize the index into a recommended learning path, with prerequisites and
+links to the preceding and following guides:
+
+1. **Getting started:** install Ruby 4.0.8, run the tests, invoke an ordinary Ruby
+   use case directly, and compose the smallest working application.
+2. **Objects and responsibilities:** grow the order-confirmation example and
+   explain the responsibilities of the domain, use case, repository, controller,
+   and invocation boundary.
+3. **Composition and execution:** factories, dependency injection, application
+   independence, startup validation, resource ownership, and explicit
+   transactional policies.
+4. **Data Mapper and sessions:** external descriptors, converters, UUIDs,
+   identity maps, change tracking, detached results, and rollback semantics.
+5. **Queries and associations:** criteria, ordering, pagination, explicit load
+   plans, association identity, and the handling of unloaded foreign keys.
+6. **HTTP APIs:** build the order endpoint step by step; show parameter
+   normalization, JSON, routes, HEAD, OPTIONS, keep-alive, limits, and TLS.
+7. **Failures and observability:** register ordinary exceptions, select public
+   details, inspect problem responses, and reason about commit, presentation,
+   sending, cancellation, and cleanup failures.
+8. **SQLite and schema evolution:** replace the memory adapter, evolve a schema,
+   explain parameter binding and per-invocation connections, and demonstrate
+   DELETE-journal locking and execution deadlines.
+9. **gRPC and streaming:** describe messages in Ruby, export `.proto` contracts,
+   reuse use cases through another controller, implement each streaming mode,
+   and delimit transactions per message or batch.
+10. **Concurrency and optional Ruby capabilities:** explain admission, request
+    threads, connection and stream flow control, cooperative cancellation,
+    Ruby Box, Ractor tasks, and interpreter/YJIT/ZJIT measurements.
+11. **Testing and extending the framework:** demonstrate a red-green-refactor
+    change, the shared storage contract, independent protocol clients, and the
+    protocols required of a new adapter or module.
+
+Readers may enter a focused guide directly; it must state the knowledge and
+example state assumed rather than silently depend on earlier steps.
+
+### Requirements for every guide
+
+- State what readers will build or learn and what they need beforehand.
+- Introduce one idea at a time, starting with a complete, runnable example.
+- Show filenames, commands, inputs, expected outputs, and relevant failures.
+- Develop examples through explicit intermediate steps; identify additions and
+  changes so that readers can reproduce the progression.
+- Explain the reason behind each significant design decision: the problem it
+  solves, which object owns the decision, the alternatives considered, and the
+  costs or limitations of the selected approach.
+- Connect public behavior to the collaboration that produces it. Use diagrams
+  when they clarify ownership, transaction boundaries, or message flow.
+- Include failure and cleanup behavior alongside successful behavior, with
+  examples that distinguish rollback from failures after commit.
+- Link to executable example files, relevant tests, related guides, and primary
+  protocol references where exact semantics matter.
+- End with a concrete next step or exercise that builds on the guide.
+- Describe current implementation behavior accurately; identify experimental
+  capabilities and limitations explicitly.
+
+### Repository and site
+
+- Keep guide sources, example programs, the site builder, and publishing
+  configuration versioned with the framework.
+- Provide a clear guide index, topic navigation, an in-page table of contents,
+  stable heading links, and previous/next navigation.
+- Make long explanations and code comfortable to read on desktop and mobile,
+  with semantic HTML, keyboard navigation, visible focus, and sufficient
+  contrast.
+- Give the site its own restrained presentation. The Rails Guides reference
+  governs the teaching depth and progression; it does not require copying
+  Rails branding or content.
+- Provide documented local build and preview commands, and support the project
+  path used by GitHub Pages without broken assets or links.
+- Publish through a reproducible GitHub Actions workflow, with tests and guide
+  validation as gates before deployment. Keep framework runtime dependencies
+  unchanged by the documentation toolchain.
+
+### Verification and publication gate
+
+Documentation is complete when:
+
+1. Every topic in the learning progression has a substantive guide satisfying
+   the editorial requirements above.
+2. Tutorial examples execute against the current public API, and their asserted
+   outputs and failure cases agree with automated checks.
+3. The static site builds locally, local links and heading anchors resolve, and
+   desktop/mobile rendering and keyboard navigation have been inspected.
+4. The full framework suite and documentation checks pass in GitHub Actions.
+5. The GitHub Pages deployment succeeds, and the published URL and a guide
+   page are fetched to verify the actual deployed content and assets.
+6. The repository README links to the published guides and explains how to
+   rebuild, preview, and contribute to them.
+
+Publication is part of the requested outcome. An unexecuted workflow, local
+preview, or proposed URL alone does not prove that the site is published.
