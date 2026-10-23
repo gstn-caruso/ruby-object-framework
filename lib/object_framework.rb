@@ -10,6 +10,9 @@ require_relative "object_framework/persistence/transaction"
 require_relative "object_framework/persistence/mapping"
 require_relative "object_framework/persistence/session"
 require_relative "object_framework/memory/storage"
+require_relative "object_framework/http/protocol"
+require_relative "object_framework/http/router"
+require_relative "object_framework/http/presentation"
 
 module ObjectFramework
   VERSION = "0.1.0"

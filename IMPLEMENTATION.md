@@ -7,8 +7,8 @@ scenarios before work starts on the next delivery.
 | Delivery | Scope | State |
 | --- | --- | --- |
 | 1 | Composition, invocation, errors, cancellation, diagnostics | Passed: 19 scenarios on Ruby 4.0.8 |
-| 2 | Data Mapper, queries, associations, snapshot HashMap storage | In progress |
-| 3 | HTTP/1.1 server, TLS, JSON, order confirmation example | Pending |
+| 2 | Data Mapper, queries, associations, snapshot HashMap storage | Passed: 35 cumulative scenarios on Ruby 4.0.8 |
+| 3 | HTTP/1.1 server, TLS, JSON, order confirmation example | In progress |
 | 4 | SQLite adapter, migrations, shared storage contract | Pending |
 | 5 | HTTP/2, HPACK, Protocol Buffers, gRPC and streaming interoperability | Pending |
 | 6 | Optional Ruby Box, Ractor, interpreter/YJIT/ZJIT comparison | Pending |
@@ -27,3 +27,6 @@ adapter may additionally depend on `sqlite3`; no other runtime gems are planned.
 - Delivery 1: `ruby -Ilib:test test/run.rb` — 19 tests, zero failures.
   Includes indeterminate commit outcomes, fatal unwinding, cyclic result
   rejection, module startup validation, and secondary cleanup failures.
+- Delivery 2: `ruby -Ilib:test test/run.rb` — 35 tests, zero failures.
+  Includes the shared storage contract, eight concurrent writers, mutable
+  domain-field isolation, removed-entity visibility, and immutable identities.
