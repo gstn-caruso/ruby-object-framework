@@ -1,4 +1,4 @@
-name: Verify and publish guides
+name: Verify, release gem, and publish guides
 
 on:
   push:
@@ -12,7 +12,8 @@ permissions:
 
 concurrency:
   group: guides-${{ github.ref }}
-  cancel-in-progress: true
+  queue: max
+  cancel-in-progress: false
 
 jobs:
   verify:
@@ -22,8 +23,16 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '4.0.8'
-      - name: Install the SQLite adapter dependency
-        run: gem install sqlite3 --version 2.10.1 --no-document
+      - name: Install development dependencies, including SQLite and RDoc
+        run: bundle install
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install release tooling
+        run: npm ci --ignore-scripts
+      - name: Verify semantic version rules and release notes
+        run: npm test
       - uses: actions/setup-python@v6
         with:
           python-version: '3.14'
@@ -34,7 +43,7 @@ jobs:
       - name: Run framework, protocol, and executable-guide scenarios
         run: ruby -Ilib:test test/run.rb
       - name: Build guides and verify links and anchors
-        run: ruby tools/build_guides.rb
+        run: bundle exec ruby tools/build_guides.rb
       - name: Configure Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
@@ -43,6 +52,42 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+
+  release:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      id-token: write
+    environment: release
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0.8'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install release tooling
+        run: npm ci --ignore-scripts
+      - name: Authenticate with RubyGems through trusted publishing
+        uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a
+      - name: Version, build, and publish the gem and GitHub release
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Preserve the versioned gem for release recovery
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruby-object-framework-${{ github.sha }}
+          path: pkg/*.gem
+          if-no-files-found: ignore
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

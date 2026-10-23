@@ -1,0 +1,46 @@
+{
+  "branches": ["main"],
+  "tagFormat": "v${version}",
+  "plugins": [
+    ["@semantic-release/commit-analyzer", {
+      "preset": "conventionalcommits",
+      "releaseRules": [
+        { "breaking": true, "release": "major" },
+        { "type": "feat", "release": "minor" },
+        { "release": "patch" }
+      ]
+    }],
+    ["@semantic-release/release-notes-generator", {
+      "preset": "conventionalcommits",
+      "presetConfig": {
+        "types": [
+          { "type": "feat", "section": "Features" },
+          { "type": "fix", "section": "Fixes" },
+          { "type": "perf", "section": "Performance" },
+          { "type": "docs", "section": "Documentation" },
+          { "type": "refactor", "section": "Refactoring" },
+          { "type": "test", "section": "Tests" },
+          { "type": "build", "section": "Build" },
+          { "type": "ci", "section": "CI" },
+          { "type": "chore", "section": "Maintenance" },
+          { "type": "style", "section": "Style" },
+          { "type": "revert", "section": "Reverts" }
+        ]
+      }
+    }],
+    ["@semantic-release/exec", {
+      "prepareCmd": "ruby tools/prepare_release.rb ${nextRelease.version}",
+      "publishCmd": "gem push --host https://rubygems.org pkg/ruby-object-framework-${nextRelease.version}.gem 1>&2"
+    }],
+    ["@semantic-release/git", {
+      "assets": ["lib/object_framework/version.rb", "Gemfile.lock"],
+      "message": "chore(release): ${nextRelease.version} [skip ci]"
+    }],
+    ["@semantic-release/github", {
+      "assets": [{ "path": "pkg/*.gem", "label": "Ruby gem" }],
+      "successComment": false,
+      "failComment": false,
+      "releasedLabels": false
+    }]
+  ]
+}

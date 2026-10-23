@@ -56,6 +56,8 @@ IDs. Review desktop and mobile layouts and keyboard access after layout changes.
 builds and validates the site. Pull requests receive verification; successful
 main-branch runs deploy the generated artifact to GitHub Pages. The deployment
 job requires successful verification and uses the `github-pages` environment.
+The same verification also gates the automatic gem release; see
+[release setup and recovery](RELEASING.md) for its RubyGems registration.
 
 The published site is <https://gstn-caruso.github.io/ruby-object-framework/>.
 `GUIDES_REPOSITORY=owner/name` changes source links when building a fork.
