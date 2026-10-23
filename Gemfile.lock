@@ -1,6 +1,20 @@
+PATH
+  remote: .
+  specs:
+    ruby-object-framework (0.1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
+    date (3.5.1)
+    erb (6.0.7)
+    psych (5.3.1)
+      date
+      stringio
+    rdoc (7.0.4)
+      erb
+      psych (>= 4.0.0)
+      tsort
     sqlite3 (2.10.1-aarch64-linux-gnu)
     sqlite3 (2.10.1-aarch64-linux-musl)
     sqlite3 (2.10.1-arm-linux-gnu)
@@ -11,6 +25,8 @@ GEM
     sqlite3 (2.10.1-x86_64-darwin)
     sqlite3 (2.10.1-x86_64-linux-gnu)
     sqlite3 (2.10.1-x86_64-linux-musl)
+    stringio (3.2.0)
+    tsort (0.2.0)
 
 PLATFORMS
   aarch64-linux-gnu
@@ -25,9 +41,16 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  rdoc (~> 7.0)
+  ruby-object-framework!
   sqlite3 (~> 2.10, >= 2.10.1)
 
 CHECKSUMS
+  date (3.5.1)
+  erb (6.0.7)
+  psych (5.3.1)
+  rdoc (7.0.4)
+  ruby-object-framework (0.1.0)
   sqlite3 (2.10.1-aarch64-linux-gnu) sha256=48390cc2b809acd1280f5c9daaf3c2013833adb8a5ece9b0634f708651080ccd
   sqlite3 (2.10.1-aarch64-linux-musl) sha256=db1bcddf98e4eeea80ca896f56aa3f9468364fa1ee8e042ddc6b628b5092fabb
   sqlite3 (2.10.1-arm-linux-gnu) sha256=34a67a3fe84f705a0fad6f7aa4541579300644b9acdf414797e59929a6e3528b
@@ -38,6 +61,8 @@ CHECKSUMS
   sqlite3 (2.10.1-x86_64-darwin) sha256=00d1cd2e8ecff5ad9fffa0c97de59d4f85c5fc54eada2587d53ca0bd933b7a5d
   sqlite3 (2.10.1-x86_64-linux-gnu) sha256=661ecede31e23a412059cd8c684ed84e332f64f167e4a90902cf99e8ea2c8718
   sqlite3 (2.10.1-x86_64-linux-musl) sha256=67c7c5443a930157b4e148f0f4cb9ab998ee7ecfa8ce56879a6b56d1d742b2be
+  stringio (3.2.0)
+  tsort (0.2.0)
 
 RUBY VERSION
   ruby 4.0.8

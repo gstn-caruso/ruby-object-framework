@@ -13,6 +13,35 @@ Development follows the six deliveries in [PLAN.md](PLAN.md). See the
 The initial implementation includes HTTP/1.1, native gRPC streaming, HashMap and
 SQLite persistence, and optional Ruby execution capabilities.
 
+## Installation
+
+Install the gem on Ruby 4.0.8:
+
+```sh
+gem install ruby-object-framework
+```
+
+Or add it to your application's Gemfile:
+
+```ruby
+gem "ruby-object-framework", require: "object_framework"
+```
+
+Load the framework with `require "object_framework"`. The gem includes all
+framework modules and runnable examples. SQLite remains optional; applications
+using that adapter must also declare `gem "sqlite3", "~> 2.10", ">= 2.10.1"`.
+
+## Automatic releases
+
+After verification succeeds on `main`, semantic-release updates the Ruby version
+and lockfile, creates a version tag, publishes to RubyGems.org, and attaches the
+gem and release notes to a GitHub release. Breaking changes increment major,
+`feat` increments minor, and other changes increment patch, including docs-only
+merges. The first automated release is `1.0.0`.
+
+See [release setup and recovery](docs/RELEASING.md) for the one-time RubyGems
+trusted-publisher registration and local packaging commands.
+
 ## Requirements and tests
 
 Ruby **4.0.8** is required. Version files support asdf and other Ruby managers.
@@ -38,6 +67,14 @@ Pass test filenames to run selected scenarios:
 
 ```sh
 ruby -Ilib:test test/run.rb test/core_test.rb test/invocation_test.rb
+```
+
+Release tooling requires Node.js 24.10 or newer and is only used in development
+and CI. Verify its version rules and release cycle with:
+
+```sh
+npm ci --ignore-scripts
+npm test
 ```
 
 ## An ordinary use case
