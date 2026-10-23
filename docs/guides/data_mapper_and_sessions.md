@@ -8,7 +8,9 @@ object collaboration. The data disappears when the process ends.
 
 ## Describe storage outside the entity
 
-An external mapping associates a Ruby class with a table and its fields:
+[`Mappings#define`](api/ObjectFramework/Persistence/Mappings.html#method-i-define)
+associates a Ruby class with a table. Declare its fields with
+[`Mapping#field`](api/ObjectFramework/Persistence/Mapping.html#method-i-field):
 
 ```ruby
 mappings = ObjectFramework::Persistence::Mappings.new
@@ -20,8 +22,9 @@ end
 ```
 
 `Order` still decides what `confirm` means. The descriptor decides which values
-represent an order in storage. `Session` uses both descriptions to construct a
-managed object and remember its original row.
+represent an order in storage.
+[`Session`](api/ObjectFramework/Persistence/Session.html) uses both descriptions
+to construct a managed object and remember its original row.
 
 Mappings are validated at application startup and then finalized. A missing
 identity field, duplicate column, unresolved association, or unknown field type
@@ -29,7 +32,8 @@ fails before a listener starts. UUID identities use a string `id` column.
 
 By default, loading calls the entity's keyword constructor with mapped field
 names. This keeps construction invariants active. If an existing model needs a
-different construction protocol, declare a builder:
+different construction protocol, declare a builder with
+[`Mapping#build`](api/ObjectFramework/Persistence/Mapping.html#method-i-build):
 
 ```ruby
 mappings.define(Customer, table: :customers) do
@@ -63,10 +67,13 @@ Independent session: true
 Stored state: pending
 ```
 
-`session.add(order)` assigns a UUID immediately if the order has no identity.
+[`session.add(order)`](api/ObjectFramework/Persistence/Session.html#method-i-add)
+assigns a UUID immediately if the order has no identity.
 This lets another new object refer to it before rows are inserted. The unit of
-work records an insertion; `flush` writes the serialized row into the private
-transaction. `commit` publishes the transaction's changes.
+work records an insertion;
+[`flush`](api/ObjectFramework/Persistence/Session.html#method-i-flush) writes the
+serialized row into the private transaction. `commit` publishes the
+transaction's changes.
 
 Closing a session discards its identity map and tracked objects. Closing a still
 active transaction rolls it back. The application-level `Invocation` normally
@@ -76,8 +83,10 @@ protocol and preparing fixture data.
 ## Preserve identity within one execution
 
 An identity map answers the question: which Ruby object represents this class
-and UUID in this session? Repeated `find` calls return the same object.
-Associations loaded through the same session also use that identity map.
+and UUID in this session? Repeated
+[`find`](api/ObjectFramework/Persistence/Session.html#method-i-find) calls return
+the same object. Associations loaded through the same session also use that
+identity map.
 
 This matters when two domain objects refer to one customer. A change through
 one reference must be visible through the other before persistence happens.
@@ -104,7 +113,8 @@ session.flush
 ```
 
 There is no `order.save`. The entity's job is to change legally; the session's
-job is to follow managed changes. Removing an entity uses `session.remove(order)`.
+job is to follow managed changes. Removing an entity uses
+[`session.remove(order)`](api/ObjectFramework/Persistence/Session.html#method-i-remove).
 The session then prevents it from reappearing through `find` or a query. A
 managed identity cannot change, including before its first flush.
 
@@ -115,7 +125,8 @@ is the foundation of both rollback isolation and independent sessions.
 
 ## Map a value object through a converter
 
-A value object can have a domain representation different from its column:
+[`Converter`](api/ObjectFramework/Persistence/Converter.html) lets a value
+object have a domain representation different from its column:
 
 ```ruby
 Money = Data.define(:cents)
@@ -139,7 +150,8 @@ change tracking, removals, and associations.
 
 ## Understand snapshot and commit behavior
 
-HashMap transactions start from a snapshot and keep private modifications.
+[`Memory::Storage`](api/ObjectFramework/Memory/Storage.html) transactions start
+from a snapshot and keep private modifications.
 Other transactions cannot observe those private rows. A write commit checks the
 storage revision and publishes all its changes under a mutex. If another writer
 has advanced that revision, the stale writer receives `Conflict` and publishes

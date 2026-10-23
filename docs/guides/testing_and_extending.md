@@ -118,8 +118,11 @@ StorageContract.register("Your adapter") { build_your_storage }
 
 The contract source is
 [`test/support/storage_contract.rb`](https://github.com/gstn-caruso/ruby-object-framework/blob/main/test/support/storage_contract.rb).
-Your storage must begin independent `:read` and `:write` transactions. A
-transaction provides:
+Your storage must begin independent `:read` and `:write` transactions, as
+[`Memory::Storage`](api/ObjectFramework/Memory/Storage.html) and
+[`SQLite::Storage`](api/ObjectFramework/SQLite/Storage.html) do. A transaction
+follows the [`Persistence::Transaction`](api/ObjectFramework/Persistence/Transaction.html)
+lifecycle and provides:
 
 ```ruby
 find(table, id)                 # A value row, or nil.
@@ -162,8 +165,9 @@ capabilities exist. State the specific guarantee each scenario establishes.
 
 ## Add a module at the composition boundary
 
-A module declares its name and dependencies, configures explicit factories or
-operations, validates before startup, starts its resources, and stops them.
+[`Application#install`](api/ObjectFramework/Application.html#method-i-install)
+registers a module that declares its name and dependencies, configures explicit
+factories or operations, validates before startup, starts its resources, and stops them.
 Use that protocol for transport or infrastructure integration. Domain classes
 continue to receive collaborators through constructors.
 
@@ -185,6 +189,11 @@ Complete tutorial programs live in `examples/guides`. An example directive in a
 guide includes the actual Ruby file during the build, and the manifest specifies
 its expected output. Keep the explanation, runnable program, and assertion in
 one change.
+
+Link class and method names to their pages in the
+[API reference](api/index.html) where you introduce their behavior. See the
+[documentation authoring instructions](https://github.com/gstn-caruso/ruby-object-framework/blob/main/docs/README.md)
+for link syntax and RDoc source comments.
 
 Build and preview locally:
 

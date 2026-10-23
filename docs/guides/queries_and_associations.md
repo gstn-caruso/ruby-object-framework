@@ -8,7 +8,8 @@ adding unrelated order-confirmation rules.
 
 ## Make a query an object
 
-`Persistence::Query` is an immutable description. Each modifier returns a new
+[`Persistence::Query`](api/ObjectFramework/Persistence/Query.html) is an
+immutable description. Each modifier returns a new
 query, leaving the original available for another caller:
 
 ```ruby
@@ -22,7 +23,9 @@ Criteria use stored column names and stored values. If a domain attribute
 integer. The query describes work for the adapter, which interprets it against
 rows; it does not call methods on every loaded domain object.
 
-Use `where` for equality and `compare` for the supported operators:
+Use [`where`](api/ObjectFramework/Persistence/Query.html#method-i-where) for
+equality and [`compare`](api/ObjectFramework/Persistence/Query.html#method-i-compare)
+for the supported operators:
 
 ```ruby
 query = ObjectFramework::Persistence::Query.new
@@ -54,13 +57,15 @@ Customer: Ada
 Shared identity: true
 ```
 
-`belongs_to :customer` stores the customer's UUID in `customer_id`. Both new
+[`belongs_to :customer`](api/ObjectFramework/Persistence/AssociationDSL.html#method-i-belongs_to)
+stores the customer's UUID in `customer_id`. Both new
 objects are registered before flush so that their identities are available.
 When the session later loads that association, it asks for the customer by
 identity and obtains the same object a direct `find(Customer, id)` would return.
 
-You can declare the inverse collection with `has_many`. Its foreign key must
-be mapped on the target entity:
+You can declare the inverse collection with
+[`has_many`](api/ObjectFramework/Persistence/AssociationDSL.html#method-i-has_many).
+Its foreign key must be mapped on the target entity:
 
 ```ruby
 # On Customer's mapping:
@@ -73,7 +78,10 @@ or a belongs-to foreign key. Startup verifies the target and foreign key.
 ## Choose an explicit load plan
 
 A session does not perform hidden association queries when domain code reads
-an attribute. Supply a load plan at the retrieval boundary:
+an attribute. Supply a load plan to
+[`Session#find`](api/ObjectFramework/Persistence/Session.html#method-i-find) or
+[`Session#query`](api/ObjectFramework/Persistence/Session.html#method-i-query)
+at the retrieval boundary:
 
 ```ruby
 purchase = session.find(Purchase, purchase_id, load: [:customer])
@@ -119,13 +127,16 @@ tracking rather than serving only as a query optimization hint.
 
 ## Order and paginate predictably
 
-`order(:total_cents, :desc)` can be followed by additional ordering fields.
+[`order(:total_cents, :desc)`](api/ObjectFramework/Persistence/Query.html#method-i-order)
+can be followed by additional ordering fields.
 When `id` is not already included, the adapter adds it as a final ascending
 tie-breaker. UUID order is deterministic within the snapshot; it does not
 represent creation time.
 
-`limit` and `offset` require nonnegative integers. Paging separate transactions
-while other writers change the dataset can still move records between pages.
+[`limit`](api/ObjectFramework/Persistence/Query.html#method-i-limit) and
+[`offset`](api/ObjectFramework/Persistence/Query.html#method-i-offset) require
+nonnegative integers. Paging separate transactions while other writers change
+the dataset can still move records between pages.
 The tie-breaker stabilizes equal sort values, while snapshot lifetime determines
 which dataset is being paged.
 

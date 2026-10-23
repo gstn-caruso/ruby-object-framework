@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module ObjectFramework
+  # External domain mappings, immutable queries, and invocation-owned sessions.
   module Persistence
+    # Converts a field between domain values and independent storage values.
     class Converter
       def initialize(dump: ->(value) { value }, load: ->(value) { value })
         @dump, @load = dump, load
@@ -15,7 +17,32 @@ module ObjectFramework
     Field = Data.define(:name, :column, :type, :converter, :reader, :writer)
     Association = Data.define(:name, :kind, :target, :foreign_key, :reader, :writer)
 
+    # Explicit association declarations used by Mapping.
     module AssociationDSL
+      ##
+      # :method: belongs_to
+      # :args: name, target:, foreign_key:, read: nil, write: nil
+      #
+      # Declares a reference to +target+, storing its UUID in +foreign_key+ on
+      # this mapping's table. The target must have a registered Mapping.
+      # Optional +read+ and +write+ callables replace public attribute accessors.
+      # Returns +self+. Associations load only when requested through a
+      # Session#find or Session#query load plan.
+      #
+      #   belongs_to :customer, target: Customer, foreign_key: :customer_id
+
+      ##
+      # :method: has_many
+      # :args: name, target:, foreign_key:, read: nil, write: nil
+      #
+      # Declares a collection of +target+ entities whose +foreign_key+ refers
+      # to this entity's UUID. The target mapping must expose that foreign key
+      # as a field or a belongs-to association. Optional +read+ and +write+
+      # callables replace public attribute accessors. Returns +self+.
+      # Collections load only through an explicit session load plan.
+      #
+      #   has_many :purchases, target: Purchase, foreign_key: :customer_id
+
       %i[belongs_to has_many].each do |kind|
         define_method(kind) do |name, target:, foreign_key:, read: nil, write: nil|
           mutable!
@@ -33,6 +60,9 @@ module ObjectFramework
       end
     end
 
+    # Describes how an ordinary Ruby class is hydrated and stored.
+    # An +id+ field mapped to the +id+ column is required. Declarations become
+    # immutable when their Mappings collection is validated at startup.
     class Mapping
       include AssociationDSL
       TYPES = %i[string integer float boolean blob].freeze
@@ -44,6 +74,9 @@ module ObjectFramework
         @builder = ->(attributes) { entity_class.new(**attributes) }
       end
 
+      # Maps an attribute to a column using a type in TYPES. Optional +read+
+      # and +write+ callables replace public attribute accessors. +converter+
+      # supplies +dump+ and +load+ transformations. Returns +self+.
       def field(name, column: name, type: :string, converter: Converter.new, read: nil, write: nil)
         mutable!
         name, column = Query.identifier(name), Query.identifier(column)
@@ -55,6 +88,8 @@ module ObjectFramework
         self
       end
 
+      # Replaces keyword construction with a callable receiving an attributes
+      # hash. Use this when hydration needs a domain-specific constructor.
       def build(&builder)
         mutable!
         @builder = builder
@@ -107,6 +142,13 @@ module ObjectFramework
       end
     end
 
+    # Owns the application's mappings without modifying domain classes.
+    #
+    #   mappings = ObjectFramework::Persistence::Mappings.new
+    #   mappings.define(Order, table: :orders) do
+    #     field :id
+    #     field :status
+    #   end
     class Mappings
       include Enumerable
 
@@ -114,6 +156,8 @@ module ObjectFramework
         @mappings = {}
       end
 
+      # Registers one Mapping per domain class and table. Evaluates the
+      # declaration block against that mapping and returns it.
       def define(entity_class, table:, &description)
         raise ConfigurationError, "Mappings are finalized" if @mappings.frozen?
         raise ConfigurationError, "Duplicate entity mapping" if @mappings.key?(entity_class)

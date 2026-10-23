@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ObjectFramework
+  # Copies storage state and detaches values crossing an invocation boundary.
   module Values
     # Storage values are immutable; domain state receives its own editable copy.
     def self.mutable_copy(value)
@@ -13,6 +14,8 @@ module ObjectFramework
       end
     end
 
+    # Returns an independent, immutable graph of supported scalar, Array, Hash,
+    # and Data values. Raises UnsafeResult for cycles and unsupported objects.
     def self.detach(value, visiting = {})
       composite = value.is_a?(Array) || value.is_a?(Hash) || value.is_a?(Data)
       if composite
@@ -32,11 +35,15 @@ module ObjectFramework
     end
   end
 
+  # Thread-safe cooperative cancellation and a monotonic-clock deadline.
+  # Work must call #check! at suitable boundaries to observe either condition.
   class Cancellation
+    # +deadline+ is an absolute monotonic timestamp, or +nil+ for no deadline.
     def initialize(deadline: nil, clock: -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) })
       @deadline, @clock, @mutex, @cancelled = deadline, clock, Mutex.new, false
     end
 
+    # Requests cancellation without interrupting or terminating the worker.
     def cancel
       @mutex.synchronize { @cancelled = true }
     end
@@ -49,6 +56,8 @@ module ObjectFramework
       @mutex.synchronize { @deadline = deadline }
     end
 
+    # Raises Cancelled if cancellation was requested, or DeadlineExceeded if
+    # the monotonic deadline has passed.
     def check!
       raise Cancelled, "Operation cancelled" if @mutex.synchronize { @cancelled }
       limit = deadline
@@ -56,10 +65,14 @@ module ObjectFramework
     end
   end
 
+  # Invocation metadata shared by execution, transport, and diagnostics.
+  # Inject it through the reserved +context+ dependency; do not share sessions
+  # or this context with isolated tasks.
   class ExecutionContext
     attr_reader :operation_id, :cancellation
     attr_accessor :transaction_state
 
+    # Generates an operation UUID and records a monotonic start time.
     def initialize(cancellation: Cancellation.new)
       @operation_id = SecureRandom.uuid.freeze
       @cancellation, @started_at = cancellation, monotonic
@@ -67,6 +80,7 @@ module ObjectFramework
       @mutex = Mutex.new
     end
 
+    # Returns the elapsed time in seconds since construction.
     def elapsed
       monotonic - @started_at
     end
@@ -85,6 +99,7 @@ module ObjectFramework
     end
   end
 
+  # Resolves and closes the collaborators belonging to one invocation.
   class Scope
     def initialize(factories, context:)
       @factories, @context, @instances, @resources = factories, context, { context: }, []
@@ -114,6 +129,8 @@ module ObjectFramework
     end
   end
 
+  # Executes a use case, detaches its result, and owns transaction cleanup.
+  # Applications normally enter this lifecycle through Application#invoke.
   class Invocation
     def initialize(operation:, factories:, storage:, reporter:, mappings: nil)
       @operation, @factories, @storage, @reporter, @mappings = operation, factories, storage, reporter, mappings

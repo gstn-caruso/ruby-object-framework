@@ -24,7 +24,27 @@ asdf install ruby 4.0.8
 asdf set ruby 4.0.8
 ```
 
-Clone the source and enter the repository:
+## Install ObjectFramework
+
+Install the framework as a gem:
+
+```sh
+gem install ruby-object-framework
+```
+
+For an application managed with Bundler, add this to its Gemfile and run
+`bundle install`:
+
+```ruby
+gem "ruby-object-framework", require: "object_framework"
+```
+
+Your application can then use `require "object_framework"` without `-Ilib`.
+The SQLite adapter is optional and requires an additional
+`gem "sqlite3", "~> 2.10", ">= 2.10.1"` declaration when used.
+
+To follow the supplied examples and develop the framework, clone the source
+and enter the repository:
 
 ```sh
 git clone https://github.com/gstn-caruso/ruby-object-framework.git
@@ -63,8 +83,9 @@ use case's job remains the greeting.
 
 ## Compose the application
 
-The next version keeps the same constructor and `call` protocol, and returns a
-hash so that the boundary has an explicit public value:
+[`ObjectFramework::Application`](api/ObjectFramework/Application.html) composes
+the next version. It keeps the same constructor and `call` protocol, and returns
+a hash so that the boundary has an explicit public value:
 
 <!-- example: examples/guides/02_composed_application.rb -->
 
@@ -81,10 +102,15 @@ Hello, Ada
 Result is frozen: true
 ```
 
-There are three new declarations. `factory` describes how to build a named
-collaborator. `operation` binds an intention to its use-case class, dependencies,
-and transaction policy. `start` validates and finalizes those registrations.
-`invoke` then constructs an execution scope and a fresh use-case instance.
+There are three new declarations.
+[`factory`](api/ObjectFramework/Application.html#method-i-factory) describes how
+to build a named collaborator.
+[`operation`](api/ObjectFramework/Application.html#method-i-operation) binds an
+intention to its use-case class, dependencies, and transaction policy.
+[`start`](api/ObjectFramework/Application.html#method-i-start) validates and
+finalizes those registrations.
+[`invoke`](api/ObjectFramework/Application.html#method-i-invoke) then constructs
+an execution scope and a fresh use-case instance.
 
 The factory block runs when the invocation needs `greeting`. It is not a global
 service locator. Inside the use case, the collaborator is already present as
@@ -107,8 +133,9 @@ Try assigning `result[:message] = "Changed"` inside the example. Ruby raises
 from the returned values in the caller.
 
 Returning an arbitrary domain object, an IO object, or a cyclic array raises
-`ObjectFramework::UnsafeResult` before commit. This is a programming error in
-the operation's public boundary. It prevents an apparent success from leaking
+[`ObjectFramework::UnsafeResult`](api/ObjectFramework/UnsafeResult.html) before
+commit. This is a programming error in the operation's public boundary. It
+prevents an apparent success from leaking
 managed state whose transaction or resources are about to close.
 
 ## Inspect startup and cleanup failures
@@ -123,9 +150,11 @@ stable registry lets concurrent requests construct scopes without competing
 with configuration changes. The tradeoff is that applications must finish
 configuration before they open listeners.
 
-The `ensure` block belongs around the started application because cleanup must
-also happen when the invocation fails. Scoped resources opt into their own
-cleanup with `close: true`; you will use that in the composition guide.
+The `ensure` block calls
+[`stop`](api/ObjectFramework/Application.html#method-i-stop) on the started
+application because cleanup must also happen when the invocation fails. Scoped
+resources opt into their own cleanup with `close: true`; you will use that in
+the composition guide.
 
 ## Run the framework's verification suite
 

@@ -8,6 +8,7 @@ require "uri"
 require "rdoc"
 require "rdoc/markdown"
 require "rdoc/markup/to_html"
+require_relative "api"
 
 module GuideSite
   ROOT = File.expand_path("..", __dir__)
@@ -48,6 +49,7 @@ module GuideSite
     def build
       FileUtils.mkdir_p(@destination)
       FileUtils.cp_r(File.join(__dir__, "assets"), @destination)
+      APIReference.new.build(destination: File.join(@destination, "api"))
       template = ERB.new(File.read(File.join(__dir__, "layout.html.erb")), trim_mode: "-")
       @guides.each_with_index do |guide, index|
         source = File.read(File.join(@source, "#{guide.slug}.md"))
@@ -71,7 +73,7 @@ module GuideSite
     def h(text); CGI.escapeHTML(text.to_s); end
 
     def validate!
-      files = Dir[File.join(@destination, "*.html")]
+      files = Dir[File.join(@destination, "**/*.html")]
       anchors = files.to_h do |file|
         ids = File.read(file).scan(/\bid="([^"]+)"/).flatten
         raise InvalidGuide, "Duplicate anchors in #{file}" unless ids.uniq.size == ids.size
@@ -85,7 +87,7 @@ module GuideSite
           unless target.start_with?(@destination + "/") && File.file?(target)
             raise InvalidGuide, "Broken local link #{link} in #{File.basename(file)}"
           end
-          if uri.fragment && anchors.key?(target) && !anchors.fetch(target).include?(uri.fragment)
+          if uri.fragment && anchors.key?(target) && !anchors.fetch(target).include?(URI::DEFAULT_PARSER.unescape(uri.fragment))
             raise InvalidGuide, "Missing anchor #{link} in #{File.basename(file)}"
           end
         end

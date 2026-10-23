@@ -1,0 +1,41 @@
+@import url("../assets/fonts.css");
+
+:root {
+  --font-family-base: var(--type-reading);
+  --font-family-heading: var(--type-heading);
+  --font-family-mono: var(--type-code);
+  --color-primary-600: #c81418;
+  --color-primary-700: #6b0b0d;
+  --line-height-relaxed: 1.7;
+}
+
+body { font-variant-ligatures: common-ligatures; font-variant-numeric: oldstyle-nums; }
+main { font-size: 17px; }
+main h1, main h2 { font-weight: 700; }
+main h1, main h2, main h3, main h4, main h5, main h6, main ol { font-variant-numeric: lining-nums; }
+main h3, main h4, main h5, main h6 { font-family: var(--type-reading); }
+
+main h1, main h1[class] {
+  font-size: clamp(2.25rem, 3.5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  overflow-wrap: anywhere;
+}
+
+main header h2, main header h3 {
+  font-family: var(--type-heading);
+  font-weight: 700;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 1rem;
+  margin: 3rem 0 1.5rem;
+  font-size: 28px;
+  line-height: 1.25;
+}
+
+main .method-heading { font-size: 16px; line-height: 1.6; }
+
+@media (max-width: 479px) {
+  main h1, main h1[class] { font-size: clamp(1.375rem, 7vw, 2rem); }
+  main header h2, main header h3 { font-size: clamp(1.25rem, 6vw, 1.5rem); }
+}

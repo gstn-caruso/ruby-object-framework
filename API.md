@@ -8,9 +8,18 @@ the [ObjectFramework Guides](https://gstn-caruso.github.io/ruby-object-framework
 ## Application composition and execution
 
 Start with [Application](rdoc-ref:ObjectFramework::Application). Register
-invocation-scoped collaborators with `factory`, declare use cases with
-`operation`, and finalize the configuration with `start`. Always call `stop`
-in an `ensure` block.
+invocation-scoped collaborators with `bean` or `factory`, declare use cases
+with `operation`, and finalize the configuration with `start`. Always call
+`stop` in an `ensure` block.
+
+`bean(:name, SomeClass)` registers an ordinary Ruby class;
+`bean(:name) { |dependency:| ... }` registers a builder. Beans and operations
+infer dependencies from required constructor or block keywords when
+`dependencies:` is omitted. Optional keywords retain their defaults unless
+explicitly listed. Beans share the factory namespace and are constructed
+lazily once per invocation. Every subsequent invocation gets fresh instances.
+`close: true` closes a bean in reverse construction order on success or failure.
+`factory` keeps its explicit dependency list.
 
 Each operation declares `policy: :none`, `:read`, or `:write`. Transactional
 operations require storage. Dependencies are explicit constructor keywords;

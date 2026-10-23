@@ -10,7 +10,10 @@ packages belong to the client and verification tooling, not the Ruby server.
 
 ## Describe messages as Ruby objects
 
-`examples/orders/contracts.rb` declares the public request and result:
+`examples/orders/contracts.rb` declares the public request and result with
+[`Protobuf::Message`](api/ObjectFramework/Protobuf/Message.html). Its
+[`field`](api/ObjectFramework/Protobuf/Message.html#method-i-field) method
+assigns each field a name, wire number, and type:
 
 ```ruby
 request = ObjectFramework::Protobuf::Message.new("ConfirmOrderRequest") do
@@ -44,6 +47,10 @@ the decoder cannot infer an application's requirement that it be nonempty.
 Validate that business input explicitly when the operation needs that rule.
 
 ## Bind the same intention
+
+[`GRPC::Controller`](api/ObjectFramework/GRPC/Controller.html) connects the
+operation to a [`GRPC::Server`](api/ObjectFramework/GRPC/Server.html) and its
+service descriptors:
 
 ```ruby
 controller = ObjectFramework::GRPC::Controller.new(
@@ -104,7 +111,8 @@ interoperability tests a continuing responsibility of this project.
 
 ## Select a streaming shape
 
-`Service#rpc` declares streaming direction with `client_streaming:` and
+[`Service#rpc`](api/ObjectFramework/GRPC/Service.html#method-i-rpc) declares
+streaming direction with `client_streaming:` and
 `server_streaming:`. A controller still implements `call(input, context:)`:
 
 | RPC shape | Input | Return value |

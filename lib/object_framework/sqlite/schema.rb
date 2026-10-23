@@ -5,10 +5,15 @@ module ObjectFramework
     ForeignKey = Data.define(:table, :column, :target)
     Migration = Data.define(:version, :actions)
 
+    # Declared SQLite tables, foreign keys, and consecutive schema migrations.
+    # Version 1 creates the initial tables. Storage finalizes this declaration
+    # and applies pending migrations transactionally during construction.
     class Schema
       TYPES = { string: "TEXT", integer: "INTEGER", float: "REAL", boolean: "INTEGER", blob: "BLOB" }.freeze
       attr_reader :tables, :foreign_keys, :migrations
 
+      # Validates domain mappings and derives tables and belongs-to foreign
+      # keys. Returns a schema that can still receive migration declarations.
       def self.from_mappings(mappings)
         mappings.validate!
         keys = mappings.flat_map do |mapping|
@@ -30,6 +35,10 @@ module ObjectFramework
         @migrations = [Migration.new(version: 1, actions: [].freeze)]
       end
 
+      # Declares the next consecutive version using Editor#add_column.
+      # Declare migrations before constructing Storage. Returns +self+.
+      #
+      #   schema.migration(2) { add_column :orders, :note, type: :string }
       def migration(version, &declaration)
         raise ConfigurationError, "Schema is finalized" if frozen?
         raise ConfigurationError, "Migration versions must be consecutive" unless version == @migrations.last.version + 1

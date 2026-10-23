@@ -22,11 +22,13 @@ controller = ObjectFramework::HTTP::Controller.new(
 )
 ```
 
-The controller owns transport interpretation. `ConfirmOrder` continues to
+[`HTTP::Controller`](api/ObjectFramework/HTTP/Controller.html) owns transport
+interpretation. `ConfirmOrder` continues to
 receive business arguments and injected collaborators. It does not need a
 request object, a header map, or HTTP-specific exception classes.
 
-Parameter declarations select fields from `:path`, `:query`, or `:body`.
+[`Parameters#field`](api/ObjectFramework/HTTP/Parameters.html#method-i-field)
+selects fields from `:path`, `:query`, or `:body`.
 Required fields are required by default; `required: false` omits an absent field
 so that the use case can apply its own keyword default. Query and path numbers
 can be normalized to `Integer` or `Float`; JSON body values must already have
@@ -37,6 +39,12 @@ typed order can be confirmed. A string identity can be well formed yet refer to
 no order; an existing order can still reject the transition.
 
 ## Register a route and start the listener
+
+[`HTTP::Router`](api/ObjectFramework/HTTP/Router.html) binds controllers to
+method/path patterns with
+[`route`](api/ObjectFramework/HTTP/Router.html#method-i-route).
+[`HTTP::Server`](api/ObjectFramework/HTTP/Server.html) runs the listener as an
+application module:
 
 ```ruby
 router = ObjectFramework::HTTP::Router.new
@@ -137,7 +145,8 @@ ambiguous body. This strictness follows the framing responsibilities in
 
 ## Configure limits and TLS
 
-Construct a `Parser` with `line_limit:`, `header_limit:`, and `body_limit:` to
+Construct a [`Parser`](api/ObjectFramework/HTTP/Parser.html) with
+`line_limit:`, `header_limit:`, and `body_limit:` to
 change the defaults of 8 KiB, 32 KiB, and 1 MiB. Pass it as `parser:` to the
 server. Timeouts are constructor options: `header_timeout:` defaults to 10
 seconds; body, execution, idle, and write timeouts default to 30 seconds.

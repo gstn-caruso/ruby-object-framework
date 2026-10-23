@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 module ObjectFramework
+  # Native gRPC services and streaming over the framework's HTTP/2 transport.
   module GRPC
     Method = Data.define(:name, :input, :output, :controller, :client_streaming, :server_streaming)
 
+    # Declares a gRPC service using Protobuf::Message contracts.
+    # Descriptors export proto3 source without generated Ruby message classes.
     class Service
       attr_reader :name, :methods
 
+      # +name+ is a qualified service name, for example +orders.Orders+.
       def initialize(name)
         parts = name.to_s.split(".", -1)
         raise ConfigurationError, "Invalid service name" if parts.empty?
@@ -14,6 +18,9 @@ module ObjectFramework
         @name, @methods = name.to_s.dup.freeze, {}
       end
 
+      # Adds an RPC with input/output message descriptors and a controller key.
+      # Both streaming flags default to false (unary); enable one for client
+      # or server streaming, or both for bidirectional streaming. Returns +self+.
       def rpc(name, input:, output:, controller:, client_streaming: false, server_streaming: false)
         raise ConfigurationError, "Service is finalized" if @methods.frozen?
         name = Protobuf.name(name)
@@ -29,6 +36,8 @@ module ObjectFramework
         freeze
       end
 
+      # Returns a complete proto3 contract with dependent messages and enums.
+      # Raises ConfigurationError if distinct descriptors reuse a type name.
       def to_proto
         definitions = {}
         visit = lambda do |type|

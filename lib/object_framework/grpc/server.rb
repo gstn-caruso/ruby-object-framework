@@ -66,9 +66,18 @@ module ObjectFramework
       end
     end
 
+    # Application lifecycle module serving unary and streaming gRPC calls.
+    # Every admitted RPC receives a new thread and an ExecutionContext.
+    # Controllers own the choice of operation boundaries within a stream.
+    # Install through Application#install before starting the application.
     class Server
       attr_reader :name, :port
 
+      # +services+ contains Service descriptors; +controllers+ maps their keys
+      # to callable controllers. Limits bound requests, connections, message
+      # bytes, and header bytes. Timeouts are in seconds; cancellation is
+      # cooperative. Optional +tls_context+ must supply a certificate and key;
+      # startup configures HTTP/2 ALPN. Compression supports identity only.
       def initialize(application:, services:, controllers:, host: "127.0.0.1", port: 0,
                      name: :grpc, max_requests: 128, max_connections: 128,
                      message_limit: 1024 * 1024, header_limit: 32 * 1024,

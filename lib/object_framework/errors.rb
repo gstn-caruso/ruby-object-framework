@@ -15,6 +15,8 @@ module ObjectFramework
 
   ErrorDescription = Data.define(:category, :code, :title, :details)
 
+  # Maps exception classes to safe, transport-independent public descriptions.
+  # Configure it before Application#start finalizes registrations.
   class ErrorRegistry
     CATEGORIES = %i[bad_request invalid_input unauthenticated forbidden not_found conflict
                     duplicate transaction_conflict rate_limited capacity unavailable
@@ -35,6 +37,10 @@ module ObjectFramework
       DEFAULTS.each { |type, (category, code, title)| register(type, category:, code:, title:) }
     end
 
+    # Registers a StandardError subclass with a stable +code+ and +title+.
+    # +category+ must belong to CATEGORIES. The optional +details+ callable must
+    # return only explicitly safe public values. Duplicate types are rejected.
+    # Returns +self+.
     def register(type, category:, code:, title:, details: ->(_) { {} })
       raise ConfigurationError, "Error registry is finalized" if @registrations.frozen?
       raise ConfigurationError, "Expected an exception class" unless type.is_a?(Class) && type <= StandardError
@@ -52,6 +58,8 @@ module ObjectFramework
       self
     end
 
+    # Returns an ErrorDescription for the closest registered ancestor.
+    # Unregistered exceptions receive a generic internal-error description.
     def resolve(exception)
       type = exception.class.ancestors.find { |ancestor| @registrations.key?(ancestor) }
       return ErrorDescription.new(category: :internal, code: "internal_error", title: "Internal server error", details: {}) unless type
@@ -61,11 +69,17 @@ module ObjectFramework
     end
   end
 
+  # Reports one primary failure per ExecutionContext and secondary cleanup
+  # failures. Records exclude exception messages and input values.
   class FailureReporter
+    # +sink+ receives immutable diagnostic hashes. Sink failures are suppressed
+    # so diagnostics cannot replace the original application failure.
     def initialize(sink: ->(record) {}, registry: ErrorRegistry.new)
       @sink, @registry = sink, registry
     end
 
+    # Sends operation ID, public code, exception/cause class names, backtrace,
+    # elapsed duration, transaction outcome, and the +secondary+ flag to the sink.
     def report(exception, context:, secondary: false)
       return if !secondary && !context.claim_failure
 

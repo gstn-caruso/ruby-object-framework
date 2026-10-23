@@ -36,6 +36,36 @@ Spec.test "guide builds produce readable navigation and validate local links and
   end
 end
 
+Spec.test "the site embeds a generated, searchable RDoc reference and validates its nested links" do
+  Dir.mktmpdir("object-framework-api") do |output|
+    builder = GuideSite::Builder.new(destination: output)
+    builder.build
+    index = File.read(File.join(output, "index.html"))
+    assert index.include?('id="api-reference"')
+    assert index.match?(/<iframe\b[^>]*src="api\/index.html"[^>]*title="[^"]+"/)
+    assert index.include?("Version: #{ObjectFramework::VERSION}")
+    assert index.include?("(v#{ObjectFramework::VERSION})")
+    reference = File.read(File.join(output, "api/index.html"))
+    assert reference.include?("ObjectFramework #{ObjectFramework::VERSION} API")
+    assert reference.include?("Application composition and execution")
+    assert File.file?(File.join(output, "api/js/search_data.js"))
+    %w[Application Persistence/Session HTTP/Server GRPC/Service Protobuf/Message SQLite/Schema Capabilities/IsolatedTask].each do |name|
+      assert File.file?(File.join(output, "api/ObjectFramework/#{name}.html")), "Missing RDoc for #{name}"
+    end
+    application_path = File.join(output, "api/ObjectFramework/Application.html")
+    application = File.read(application_path)
+    assert application.include?('id="method-i-invoke"')
+    assert application.include?("Registers an invocation-scoped collaborator")
+
+    File.write(application_path, application + '<a href="Missing.html">Missing class</a>')
+    error = assert_raises(GuideSite::InvalidGuide) { builder.validate! }
+    assert error.message.include?("Missing.html")
+    File.write(application_path, application + '<a href="#missing-method">Missing method</a>')
+    error = assert_raises(GuideSite::InvalidGuide) { builder.validate! }
+    assert error.message.include?("missing-method")
+  end
+end
+
 YAML.safe_load_file(File.expand_path("../examples/guides/manifest.yml", __dir__)).each do |example|
   Spec.test "guide example #{example.fetch('file')} produces its documented result" do
     path = File.expand_path("../examples/guides/#{example.fetch('file')}", __dir__)

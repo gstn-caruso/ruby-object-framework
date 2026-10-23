@@ -9,7 +9,8 @@ need these optional capabilities to serve requests or persist data.
 
 ## Separate connection progress from application ownership
 
-HTTP/1.1 has a dispatcher that progresses connections through IO readiness and
+[`HTTP::Server`](api/ObjectFramework/HTTP/Server.html) has a dispatcher that
+progresses HTTP/1.1 connections through IO readiness and
 header parsing. An admitted request gets a fresh thread, which owns body
 decoding, controller execution, the use-case invocation, and response sending.
 Keep-alive returns the connection for another sequential request; it does not
@@ -59,7 +60,8 @@ those values mean for its domain operation.
 
 ## Run an isolated Ractor task
 
-An isolated task is a class or module implementing `self.call(input)`:
+[`Capabilities::IsolatedTask`](api/ObjectFramework/Capabilities/IsolatedTask.html)
+executes a class or module implementing `self.call(input)`:
 
 <!-- example: examples/guides/11_ractor.rb -->
 
@@ -112,9 +114,12 @@ second application
 Definitions leaked: false
 ```
 
-`Definitions#load` loads a trusted application file into that box;
-`constant(:YourUseCase)` obtains the class to compose into an application.
-`evaluate` is useful for small definition experiments such as this example.
+[`Definitions#load`](api/ObjectFramework/Capabilities/Definitions.html#method-i-load)
+loads a trusted application file into that box;
+[`constant(:YourUseCase)`](api/ObjectFramework/Capabilities/Definitions.html#method-i-constant)
+obtains the class to compose into an application.
+[`evaluate`](api/ObjectFramework/Capabilities/Definitions.html#method-i-evaluate)
+is useful for small definition experiments such as this example.
 Two ordinary `Application` objects already have separate registries. Ruby Box
 adds isolation for Ruby definitions that would otherwise share a constant
 namespace.
@@ -154,7 +159,8 @@ as a deployment-wide speed claim.
 
 ## Make cancellation cooperative
 
-Use `context.cancellation.check!` between pieces of application work. The
+Call [`Cancellation#check!`](api/ObjectFramework/Cancellation.html#method-i-check-21)
+through `context.cancellation` between pieces of application work. The
 invocation also checks before work and before commit. HTTP body and header
 deadlines govern transport reading; gRPC deadlines also govern waiting for
 messages and flow-control capacity.

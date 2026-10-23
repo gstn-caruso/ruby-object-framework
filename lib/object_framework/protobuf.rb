@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ObjectFramework
+  # Ruby descriptors and wire encoding for proto3 messages and enums.
   module Protobuf
     SCALARS = {
       int32: 0, int64: 0, uint32: 0, uint64: 0, sint32: 0, sint64: 0, bool: 0,
@@ -59,6 +60,8 @@ module ObjectFramework
       end
     end
 
+    # Immutable proto3 enum declaration. Its first value must be zero, and
+    # names and numeric values must be unique and valid for proto3.
     class Enum
       attr_reader :name, :values
       def initialize(name, **values)
@@ -76,6 +79,14 @@ module ObjectFramework
 
     Field = Data.define(:name, :number, :type, :repeated, :packed)
 
+    # Immutable message descriptor encoding and decoding ordinary value hashes.
+    # Declare fields in the construction block.
+    #
+    #   message = ObjectFramework::Protobuf::Message.new("Greeting") do
+    #     field :text, 1, :string
+    #   end
+    #   bytes = message.encode(text: "Hello")
+    #   message.decode(bytes) # => { text: "Hello" }
     class Message
       attr_reader :name, :fields
 
@@ -87,6 +98,9 @@ module ObjectFramework
         freeze
       end
 
+      # Declares a unique field name and proto3 number. +type+ is a scalar in
+      # SCALARS, another Message, or an Enum. Repeated numeric fields use packed
+      # encoding by default. Declare fields only during construction.
       def field(name, number, type, repeated: false, packed: true)
         name = Protobuf.name(name).to_sym
         unless number.is_a?(Integer) && number.between?(1, 2**29 - 1) && !number.between?(19_000, 19_999)
@@ -97,6 +111,9 @@ module ObjectFramework
         @fields << Field.new(name:, number:, type:, repeated:, packed:)
       end
 
+      # Encodes a Hash or Data value, or keyword attributes, as binary proto3.
+      # Raises InvalidInput for unknown fields, invalid values, or excessive
+      # nesting. Repeated fields require arrays.
       def encode(values = nil, depth: 0, **attributes)
         raise InvalidInput, "Protobuf nesting limit exceeded" if depth >= 64
         raise InvalidInput, "Pass message values once" if values && !attributes.empty?
@@ -122,6 +139,8 @@ module ObjectFramework
         end
       end
 
+      # Decodes binary proto3 into a Hash, supplying defaults for absent fields
+      # and skipping unknown fields. Malformed input raises InvalidInput.
       def decode(bytes, depth: 0, initial: nil)
         raise InvalidInput, "Protobuf nesting limit exceeded" if depth >= 64
         cursor = Wire::Cursor.new(bytes)

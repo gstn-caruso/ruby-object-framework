@@ -1,5 +1,5 @@
 <section class="introduction">
-  <h1>ObjectFramework Guides <span>(v0.1.0)</span></h1>
+  <h1>ObjectFramework Guides <span>(v<%= h(ObjectFramework::VERSION) %>)</span></h1>
   <p>These guides teach you to build Ruby applications from collaborating objects. Start with a plain use case, grow it into an order-confirmation application, and understand how its objects, transactions, HTTP, and gRPC fit together.</p>
 </section>
 <div class="guide-index">
@@ -12,4 +12,10 @@
     </dl></section>
   <% end -%>
 </div>
+<section class="api-reference" id="api-reference" aria-labelledby="api-title">
+  <h2 id="api-title">API reference</h2>
+  <p>Look up classes, method signatures, and contracts in the RDoc reference. Use its search to find an object or method while you read.</p>
+  <p><a href="api/index.html">Open the full API reference</a>, or jump to <a href="api/ObjectFramework/Application.html">application composition</a>, <a href="api/ObjectFramework/Persistence/Session.html">persistence sessions</a>, <a href="api/ObjectFramework/HTTP/Server.html">HTTP</a>, and <a href="api/ObjectFramework/GRPC/Service.html">gRPC services</a>.</p>
+  <iframe src="api/index.html" title="ObjectFramework RDoc API reference" loading="lazy"></iframe>
+</section>
 <section class="reading-note"><h2>Read the code alongside the guides</h2><p>The examples are versioned with the framework and run in its test suite. When a guide shows a full example, its source link opens the exact program. Explanations also point to implementation tests, so you can follow a claim to executable evidence.</p><p>Ruby Box, Ractor, and JIT features are optional. The core framework runs on Ruby 4.0.8; SQLite is its sole optional runtime gem.</p></section>

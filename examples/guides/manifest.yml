@@ -60,3 +60,10 @@
     PASS a price includes twenty percent tax
     PASS negative prices are rejected
     3 tests, 0 failures
+- file: 14_request_beans.rb
+  output: |
+    Counter closed
+    Request 1: 1, 2
+    Counter closed
+    Request 2: 1, 2
+    Independent contexts: true

@@ -5,6 +5,9 @@ module ObjectFramework
     class ClosedTransaction < StandardError; end
     class ReadOnlyTransaction < StandardError; end
 
+    # Base lifecycle for read/write storage transactions. Adapters implement
+    # row access, commit, and storage cleanup. #close rolls back an active
+    # transaction and is safe to repeat. Committed transactions cannot be reused.
     class Transaction
       attr_reader :state, :mode
 

@@ -21,9 +21,16 @@ module ObjectFramework
       end
     end
 
+    # Optional file-backed SQLite adapter, requiring the sqlite3 gem.
+    # Each transaction owns a connection with foreign keys enabled and FULL
+    # synchronization. Uses DELETE journaling, IMMEDIATE writes, and DEFERRED
+    # reads. Commit failures are propagated without automatic retry.
     class Storage
       attr_reader :schema_version
 
+      # Finalizes +schema+ and migrates the database at +path+. In-memory paths
+      # are rejected. +lock_timeout+ bounds lock waiting in seconds; execution
+      # cancellation and deadlines may interrupt that wait earlier.
       def initialize(path:, schema:, lock_timeout: 1)
         raise ConfigurationError, "SQLite requires a database file path" if path.to_s.empty? || path.to_s == ":memory:"
         raise ConfigurationError, "Lock timeout must be positive" unless lock_timeout.is_a?(Numeric) && lock_timeout.positive?
@@ -52,6 +59,8 @@ module ObjectFramework
         raise
       end
 
+      # Rejects new transactions. Already-open transactions retain ownership
+      # of their connections until they close. Stop applications first.
       def close
         @mutex.synchronize { @closed = true }
       end

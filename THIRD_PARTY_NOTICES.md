@@ -12,6 +12,15 @@ the font files in `docs/assets/fonts/Inter-LICENSE.txt` and
 - IBM Plex: https://github.com/IBM/plex, revision
   `71f558992315a12ca1f06a2215d57962a1992162`.
 
+The static Inter regular, semibold, bold, and italic files were obtained from
+`https://rubyonrails.org/assets/fonts/Inter-*.woff2?v=4.0`, the same URLs used
+by Rails Guides, on October 23, 2026. They retain the Inter license above.
+IBM Plex Mono Text uses the exact file served at
+`https://rubyonrails.org/assets/fonts/IBMPlexMono-Text.woff2`, obtained on
+October 23, 2026, under the IBM Plex license above.
+Calibre is loaded from the Rails-hosted font URLs declared in
+`docs/assets/fonts.css`; Calibre font files are not distributed in this repository.
+
 The documentation stylesheet is an original implementation of the visual
 reference requested by the project: https://guides.rubyonrails.org/index.html.
 

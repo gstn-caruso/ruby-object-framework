@@ -7,6 +7,9 @@ invocation owns its resources and transaction.
 Read the [ObjectFramework Guides](https://gstn-caruso.github.io/ruby-object-framework/)
 for progressive tutorials, executable examples, and the reasoning behind the
 framework's design. Start with [Your first application](https://gstn-caruso.github.io/ruby-object-framework/getting_started.html).
+The [RDoc API reference](https://gstn-caruso.github.io/ruby-object-framework/api/index.html)
+documents classes, signatures, and execution contracts. You can also browse it
+inside the guides' [API reference section](https://gstn-caruso.github.io/ruby-object-framework/#api-reference).
 
 Development follows the six deliveries in [PLAN.md](PLAN.md). See the
 [implementation record](IMPLEMENTATION.md) for the current delivery status.
@@ -46,6 +49,8 @@ trusted-publisher registration and local packaging commands.
 
 Ruby **4.0.8** is required. Version files support asdf and other Ruby managers.
 The core and test runner use Ruby core and the standard library.
+The guide suite and documentation build additionally use the development-only
+RDoc dependency; run `bundle install` before running the full suite.
 
 ```sh
 ruby -Ilib:test test/run.rb
@@ -93,8 +98,8 @@ class Greet
 end
 
 app = ObjectFramework::Application.new
-app.factory(:greeting) { "Hello" }
-app.operation(:greet, use_case: Greet, policy: :none, dependencies: [:greeting])
+app.bean(:greeting) { "Hello" }
+app.operation(:greet, use_case: Greet, policy: :none)
 app.start
 begin
   app.invoke(:greet, name: "Ada") # => { message: "Hello, Ada" }
@@ -109,6 +114,19 @@ invocation, may declare their own dependencies, and may opt into cleanup with
 `close: true`. The reserved `context` dependency exposes a server-generated
 operation identifier and cooperative cancellation. Application registrations
 are finalized at startup. Separate application instances have separate registries.
+
+Register request-scoped beans with `app.bean(:name, SomeClass)` or
+`app.bean(:name) { |dependency:| ... }`. Beans and operations infer dependencies
+from required constructor or block keywords. Optional keywords keep their
+defaults; pass `dependencies: [...]` to inject them explicitly. Classes remain
+ordinary Ruby objects, and `factory` remains available for explicit wiring.
+
+Every invocation constructs only the beans it needs, reuses each named bean
+within that invocation, and discards them afterward. The next request gets fresh
+instances, including on the same keep-alive connection. Resource beans can use
+`close: true` for cleanup after success or failure. See the
+[composition guide](https://gstn-caruso.github.io/ruby-object-framework/composition_and_execution.html#register-request-scoped-beans)
+and run `ruby -Ilib examples/guides/14_request_beans.rb` for a complete example.
 
 Public results contain independent, immutable values: strings, numbers,
 booleans, symbols, nil, arrays, hashes, and `Data` objects composed of these.
@@ -140,6 +158,10 @@ Keep public APIs, tests, documentation, and explanatory comments in English.
 Start a behavior change with a failing scenario in the dependency-free runner,
 then implement it and run the current delivery gate. Comments explaining
 protocol constraints and non-obvious decisions are welcome.
+Document public classes and methods with RDoc comments in `lib/`, and update
+the [API overview](API.md) when their contracts change. Build both the guides
+and API reference with `bundle exec ruby tools/build_guides.rb`; see the
+[documentation authoring instructions](docs/README.md) for preview and publishing.
 
 ## HTTP order example
 

@@ -25,6 +25,11 @@ require_relative "object_framework/grpc/messages"
 require_relative "object_framework/http2/connection"
 require_relative "object_framework/grpc/server"
 
+# Applications composed from ordinary Ruby objects, with explicit dependencies,
+# invocation-scoped resources, and transport-independent use cases.
+#
+# Application is the composition root. Persistence, HTTP, GRPC, and Protobuf
+# supply adapters and contracts; SQLite and Capabilities load on demand.
 module ObjectFramework
   autoload :SQLite, File.expand_path("object_framework/sqlite", __dir__)
   autoload :Capabilities, File.expand_path("object_framework/capabilities", __dir__)

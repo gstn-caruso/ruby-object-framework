@@ -9,12 +9,16 @@ one optional Ruby runtime gem with `bundle install`.
 
 ## Keep the application protocol stable
 
-Both adapters begin a transaction with `begin_transaction(mode:)`, then expose
-row retrieval, query, insert, update, delete, commit, rollback, close, and state.
+Both adapters begin a transaction with
+[`begin_transaction(mode:)`](api/ObjectFramework/SQLite/Storage.html#method-i-begin_transaction),
+then expose row retrieval, query, insert, update, delete, commit, rollback,
+close, and state.
 The session collaborates with that protocol rather than a database connection
 API.
 
-For a new schema matching existing mappings:
+[`SQLite::Schema.from_mappings`](api/ObjectFramework/SQLite/Schema.html#method-c-from_mappings)
+derives a schema from existing mappings. Pass it to
+[`SQLite::Storage`](api/ObjectFramework/SQLite/Storage.html):
 
 ```ruby
 schema = ObjectFramework::SQLite::Schema.from_mappings(mappings)
@@ -34,8 +38,9 @@ integer, float, boolean, and blob; domain value objects use converters.
 
 ## Evolve a schema deliberately
 
-Schema version 1 creates the declared tables. Later versions are consecutive
-migrations over that initial definition:
+Schema version 1 creates the declared tables.
+[`Schema#migration`](api/ObjectFramework/SQLite/Schema.html#method-i-migration)
+adds consecutive versions over that initial definition:
 
 ```ruby
 schema = ObjectFramework::SQLite::Schema.new(

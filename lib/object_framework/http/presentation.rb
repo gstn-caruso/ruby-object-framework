@@ -4,6 +4,8 @@ module ObjectFramework
   module HTTP
     Response = Data.define(:status, :headers, :body)
 
+    # Converts independent result values into a JSON Response with status 200.
+    # Data objects are represented as JSON objects.
     class JSONPresenter
       def call(value)
         Response.new(status: 200, headers: { "Content-Type" => "application/json" }, body: JSON.generate(json_value(value)))
@@ -21,6 +23,8 @@ module ObjectFramework
       end
     end
 
+    # Presents registered safe errors as RFC 9457 problem details, including
+    # the ExecutionContext operation ID. Exception messages are not exposed.
     class ProblemPresenter
       STATUSES = {
         bad_request: 400, invalid_input: 422, unauthenticated: 401, forbidden: 403,

@@ -96,11 +96,11 @@ The running application adds these collaborators:
 | `Order` | Whether its state transition is legal. |
 | `ConfirmOrder` | Which objects collaborate to fulfill confirmation. |
 | `Orders` repository | How application code asks for an order. |
-| External mapping | How order attributes correspond to stored values. |
-| `Session` | Which Ruby object represents an identity during this execution. |
-| `Invocation` | Scope creation, materialization, transaction policy, cleanup. |
-| HTTP or gRPC controller | How transport input becomes use-case arguments. |
-| Presenter | How independent results or public failures become protocol output. |
+| [External mapping](api/ObjectFramework/Persistence/Mapping.html) | How order attributes correspond to stored values. |
+| [`Session`](api/ObjectFramework/Persistence/Session.html) | Which Ruby object represents an identity during this execution. |
+| [`Invocation`](api/ObjectFramework/Invocation.html) | Scope creation, materialization, transaction policy, cleanup. |
+| [HTTP](api/ObjectFramework/HTTP/Controller.html) or [gRPC controller](api/ObjectFramework/GRPC/Controller.html) | How transport input becomes use-case arguments. |
+| [Presenter](api/ObjectFramework/HTTP/JSONPresenter.html) | How independent results or public failures become protocol output. |
 
 These are boundaries between decisions, not a requirement to introduce a new
 class for every line of code. The greeting used a string as a collaborator.

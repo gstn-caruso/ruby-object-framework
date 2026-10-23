@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module ObjectFramework
+  # Optional Ruby Box, Ractor, and JIT capability reporting. The core application
+  # lifecycle does not require these experimental or VM-specific features.
   module Capabilities
     class Unsupported < ConfigurationError; end
 
@@ -13,11 +15,16 @@ module ObjectFramework
       end
     end
 
+    # Returns the current availability/enabled state of Ruby Box, Ractor,
+    # YJIT, and ZJIT. JIT comparisons run in separate benchmark processes.
     def self.report
       { ruby_box: Ruby::Box.enabled?, ractor: defined?(::Ractor) != nil,
         yjit: RubyVM::YJIT.enabled?, zjit: RubyVM::ZJIT.enabled? }.freeze
     end
 
+    # Owns application definitions in a separate Ruby Box.
+    # Requires Ruby to start with RUBY_BOX=1; enabling it later has no effect.
+    # Raises Unsupported when Ruby Box is disabled.
     class Definitions
       def initialize
         raise Unsupported, "Enable Ruby Box at process boot with RUBY_BOX=1" unless Ruby::Box.enabled?
@@ -30,12 +37,18 @@ module ObjectFramework
       def constant(name); @box.const_get(name, false); end
     end
 
+    # Runs a class/module's +self.call(input)+ in a new Ractor over independent
+    # values. Sessions and execution contexts stay on the owning request thread.
     class IsolatedTask
       def initialize(task:)
         raise ConfigurationError, "An isolated task must be a class or module implementing call" unless task.is_a?(Module) && task.respond_to?(:call)
         @task = task
       end
 
+      # Returns a detached task result. Checks optional context cancellation
+      # before and after the computation; cannot interrupt a running Ractor.
+      # Remote StandardError failures become TaskFailure with the remote class
+      # name and backtrace. Use bounded computations.
       def call(input, context: nil)
         context&.cancellation&.check!
         payload = Values.detach(input)

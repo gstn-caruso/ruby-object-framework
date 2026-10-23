@@ -42,7 +42,7 @@ jobs:
           .venv/bin/python -m pip install -r test/interop/requirements.txt
       - name: Run framework, protocol, and executable-guide scenarios
         run: ruby -Ilib:test test/run.rb
-      - name: Build guides and verify links and anchors
+      - name: Build guides and RDoc and verify links and anchors
         run: bundle exec ruby tools/build_guides.rb
       - name: Configure Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

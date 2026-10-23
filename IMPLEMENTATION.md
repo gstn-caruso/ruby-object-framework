@@ -32,6 +32,19 @@ independent protocol clients, guide build, links, and anchors before deployment.
 The [published guides](https://gstn-caruso.github.io/ruby-object-framework/)
 are live on GitHub Pages.
 
+Gem distribution is implemented as `ruby-object-framework`, keeping SQLite
+optional. The suite now passes 113 Ruby scenarios, including isolated gem
+installation and version preparation, plus 11 Node release scenarios covering
+semantic changes and complete releases against temporary local Git repositories.
+The workflow updates the version and lockfile on `main`, tags the matching
+source, and publishes the gem to RubyGems and GitHub after verification.
+Workflow schema validation and a GitHub-authenticated semantic-release dry run
+passed. actionlint 1.7.12 passed with only its unsupported `queue` key check
+excluded; that field passed the current GitHub Actions schema and matches
+GitHub's documented concurrency syntax.
+Actual gem publication still requires the one-time trusted-publisher
+registration described in [release setup](docs/RELEASING.md).
+
 Publication was verified in
 [Actions run 39892939250](https://github.com/gstn-caruso/ruby-object-framework/actions/runs/39892939250).
 The live index, two guide pages, stylesheet, script, and collaboration diagram
@@ -49,6 +62,14 @@ keyboard disclosure/search, and 55 mobile Lighthouse checks locally.
 
 ## Verified delivery gates
 
+- Request-scoped beans: `ruby -Ilib:test test/run.rb` — 127 tests, zero
+  failures on Ruby 4.0.8. `Application#bean` accepts ordinary classes or builder
+  blocks, and beans and operations infer required keyword dependencies.
+  Construction is lazy and cached only within an invocation. Scenarios cover
+  concurrent invocations, successive keep-alive requests, transaction/session
+  injection, startup validation, and cleanup after success or failure. The
+  fourteenth executable guide demonstrates fresh request state and resource
+  cleanup; the suite also verifies the generated guides and RDoc links.
 - Delivery 1: `ruby -Ilib:test test/run.rb` — 19 tests, zero failures.
   Includes indeterminate commit outcomes, fatal unwinding, cyclic result
   rejection, module startup validation, and secondary cleanup failures.

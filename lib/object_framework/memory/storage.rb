@@ -1,12 +1,19 @@
 # frozen_string_literal: true
 
 module ObjectFramework
+  # Volatile, process-local persistence using revision-checked snapshots.
   module Memory
+    # Thread-safe storage adapter. Writes publish their complete snapshot
+    # atomically; a competing commit raises Conflict without automatic retry.
+    # Data is lost when the storage is closed or the process exits.
     class Storage
       def initialize
         @mutex, @tables, @revision, @closed = Mutex.new, {}, 0, false
       end
 
+      # Opens an independent snapshot in +:read+ or +:write+ mode.
+      # The caller must close the transaction; Application#invoke owns this
+      # lifecycle when the adapter is installed in an application.
       def begin_transaction(mode:)
         @mutex.synchronize do
           raise Unavailable, "Storage is closed" if @closed

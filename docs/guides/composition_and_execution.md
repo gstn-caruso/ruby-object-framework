@@ -5,13 +5,15 @@ finishes.
 
 You should understand the roles in
 [Objects and responsibilities](objects_and_responsibilities.md). The application
-API is intentionally small: factories describe construction, operations describe
-intentions and policies, and modules describe startup and shutdown.
+API is intentionally small: beans and factories describe construction,
+operations describe intentions and policies, and modules describe startup and
+shutdown.
 
 ## Declare collaborators before startup
 
-Factories name the dependencies they need and receive them as keyword
-arguments:
+[`Application#factory`](api/ObjectFramework/Application.html#method-i-factory)
+registers collaborators with explicit dependencies. Factory blocks receive
+those dependencies as keyword arguments:
 
 ```ruby
 app.factory(:orders, dependencies: [:session]) do |session:|
@@ -22,6 +24,8 @@ app.operation(:confirm_order, use_case: ConfirmOrder,
               dependencies: [:orders], policy: :write)
 ```
 
+[`Application#operation`](api/ObjectFramework/Application.html#method-i-operation)
+binds `ConfirmOrder` to its dependencies and policy.
 The `orders` factory belongs to the composition root. `ConfirmOrder` receives
 an `Orders` instance; it never needs the factory name. This keeps wiring
 decisions visible while leaving the use case independent of the container.
@@ -33,6 +37,80 @@ that invocation. A later invocation has a new cache and a new use-case object.
 The reserved dependencies are `context`, `transaction`, and `session`. Context
 is available to every policy. Transaction and session require a storage policy;
 session also requires mappings. A factory cannot shadow these names.
+
+## Register request-scoped beans
+
+[`Application#bean`](api/ObjectFramework/Application.html#method-i-bean)
+registers an ordinary Ruby class or a builder block. It infers dependencies
+from required keyword arguments, so a repository whose constructor is
+`initialize(session:)` can be registered directly:
+
+```ruby
+app.bean(:orders, Orders)
+app.operation(:confirm_order, use_case: ConfirmOrder, policy: :write)
+```
+
+`ConfirmOrder#initialize(orders:)` receives the repository, and
+`Orders#initialize(session:)` receives this invocation's session. Neither class
+needs to inherit from the framework or access the application. Bean names match
+constructor keyword names; registration remains explicit rather than scanning
+loaded classes.
+
+Beans belong to one invocation. Startup validates their dependency graph without
+constructing them. The invocation builds only the beans reached through its
+operation's dependencies and caches each named result until that invocation
+ends. A second request, including one on the same HTTP connection, builds fresh
+instances. Direct calls through `app.invoke` have the same lifetime as requests
+entering through HTTP or gRPC operations.
+
+Run a complete example:
+
+<!-- example: examples/guides/14_request_beans.rb -->
+
+```sh
+ruby -Ilib examples/guides/14_request_beans.rb
+```
+
+Expected output:
+
+```text
+Counter closed
+Request 1: 1, 2
+Counter closed
+Request 2: 1, 2
+Independent contexts: true
+```
+
+The wiring in that example is:
+
+```ruby
+app.bean(:counter, RequestCounter, close: true)
+app.bean(:first) { |counter:| counter }
+app.bean(:second) { |counter:| counter }
+app.operation(:count, use_case: CountTwice, policy: :none)
+```
+
+Both branches receive the same counter within a request, so its two reads
+produce `1, 2`. The next request starts at `1` again. Its counter also receives
+a fresh `context`. Only the `counter` registration owns cleanup: the branches
+return its instance without registering another `close` call. Cleanup happens
+before `app.invoke` returns, including when building a dependent bean or calling
+the use case raises.
+
+Only required keywords are inferred. For `initialize(clock: nil)`, Ruby's
+default remains in effect even if a `clock` bean exists. Use
+`app.bean(:service, Service, dependencies: [:clock])` to inject that optional
+keyword explicitly. Operations and builder blocks accept the same override.
+For a positional constructor, use a block such as
+`app.bean(:client) { |endpoint:| Client.new(endpoint) }`.
+
+Beans and factories use the same registry and scope, so their dependencies can
+refer to each other. Missing dependencies, cycles, reserved names, duplicate
+registrations, and registration after startup are rejected. Existing
+`factory(..., dependencies: [...])` declarations retain their behavior. The
+[bean scenarios](https://github.com/gstn-caruso/ruby-object-framework/blob/main/test/beans_test.rb)
+exercise concurrent invocations, keep-alive HTTP requests, startup failures,
+transaction dependencies, and resource cleanup.
 
 ## Observe scope ownership
 
@@ -83,7 +161,8 @@ ownership depend on a path through application code.
 
 ## Follow the invocation boundary
 
-The sequence is:
+[`Application#invoke`](api/ObjectFramework/Application.html#method-i-invoke)
+executes this sequence:
 
 1. Check cancellation and create the scope.
 2. Open the declared transaction and session.
@@ -103,7 +182,8 @@ although the normal failure boundary classifies `StandardError`.
 
 ## Compose application modules
 
-An installed module supplies `name`, `requires`, `configure(application)`,
+[`Application#install`](api/ObjectFramework/Application.html#method-i-install)
+registers a module supplying `name`, `requires`, `configure(application)`,
 `start`, and `stop`. It may also supply `validate!`. For example, HTTP and gRPC
 servers act as modules:
 
@@ -136,10 +216,11 @@ state belongs in locals or scoped collaborators. A controller is usually
 long-lived, so storing `@current_session` or `@current_order` on it would mix
 concurrent executions.
 
-Inject `context` when a use case needs cooperative cancellation or its operation
-identifier. Check `context.cancellation.check!` between bounded pieces of long
-work. The cancellation object communicates intent; the framework does not kill
-arbitrary Ruby code in the middle of a state change.
+Inject [`ExecutionContext`](api/ObjectFramework/ExecutionContext.html) through
+`context` when a use case needs cooperative cancellation or its operation
+identifier. Call [`Cancellation#check!`](api/ObjectFramework/Cancellation.html#method-i-check-21)
+between bounded pieces of long work. The cancellation object communicates intent;
+the framework does not kill arbitrary Ruby code in the middle of a state change.
 
 The [invocation scenarios](https://github.com/gstn-caruso/ruby-object-framework/blob/main/test/invocation_test.rb)
 cover successful commit, rollback, indeterminate commit outcomes, cleanup

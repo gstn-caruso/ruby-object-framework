@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="<%= h(guide ? guide.summary : 'Progressive guides to building Ruby applications from collaborating objects.') %>">
   <title><%= guide ? "#{h(guide.title)} · " : '' %>ObjectFramework Guides</title>
-  <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="https://rubyonrails.org/assets/fonts/calibre-bold.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/styles.css">
   <link rel="icon" href="assets/objects.svg" type="image/svg+xml">
   <script src="assets/guides.js" defer></script>
@@ -14,8 +15,9 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="header-inner">
-      <div class="header-brand"><a class="brand" href="index.html"><img src="assets/objects.svg" width="75" height="75" alt=""><span>ObjectFramework <b>Guides</b></span></a><span class="edition">Version: 0.1.0</span></div>
+      <div class="header-brand"><a class="brand" href="index.html"><img src="assets/objects.svg" width="48" height="48" alt=""><span>ObjectFramework <b>Guides</b></span></a><span class="edition">Version: <%= h(ObjectFramework::VERSION) %></span></div>
       <nav class="project-links" aria-label="Project"><a href="<%= h(@repository) %>">Source on GitHub</a>
+      <a href="index.html#api-reference">API reference</a>
       <details class="path-disclosure">
         <summary>Guides Index</summary>
         <div class="guide-menu">

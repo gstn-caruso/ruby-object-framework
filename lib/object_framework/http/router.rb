@@ -1,15 +1,23 @@
 # frozen_string_literal: true
 
 module ObjectFramework
+  # HTTP/1.1 routing, presentation, and bounded request serving.
   module HTTP
     Route = Data.define(:method, :pattern, :controller, :expression, :names)
     Match = Data.define(:controller, :params, :allow)
 
+    # Maps method/path patterns to explicit controller instances.
+    # Configuration is finalized by the server at application startup.
+    #
+    #   router.controller(:confirm, controller)
+    #   router.route(:post, "/orders/:id/confirm", controller: :confirm)
     class Router
       def initialize
         @controllers, @routes = {}, []
       end
 
+      # Registers a controller implementing +call(request, context:)+.
+      # Controllers normalize transport inputs and invoke application operations.
       def controller(name, instance)
         mutable!
         raise ConfigurationError, "Duplicate controller: #{name}" if @controllers.key?(name)
@@ -17,6 +25,8 @@ module ObjectFramework
         self
       end
 
+      # Adds a method and path pattern with optional +:parameter+ segments.
+      # Static routes take precedence over parameterized routes. Returns +self+.
       def route(method, pattern, controller:)
         mutable!
         method = method.to_s.upcase
@@ -49,6 +59,9 @@ module ObjectFramework
         self
       end
 
+      # Returns a Match with controller, decoded path parameters, and allowed
+      # methods. Supports HEAD through GET and automatic OPTIONS. Raises
+      # NotFound, MethodNotAllowed, or BadRequest for invalid requests.
       def resolve(method, path)
         matching = path == "*" ? @routes : @routes.select { |route| route.expression.match?(path) }
         raise NotFound, "Route not found" if matching.empty?

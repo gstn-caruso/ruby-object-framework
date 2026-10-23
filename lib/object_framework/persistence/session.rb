@@ -65,6 +65,9 @@ module ObjectFramework
       def clear; @entries.clear; end
     end
 
+    # Owns an identity map and unit of work for one active transaction.
+    # Managed entities stay inside the invocation; return independent values
+    # to callers. Application#invoke flushes and closes its session automatically.
     class Session
       attr_reader :transaction
 
@@ -74,6 +77,9 @@ module ObjectFramework
         @closed, @removed = false, {}
       end
 
+      # Tracks a new mapped entity, assigning a UUID when its identity is nil.
+      # Returns the entity. Duplicate identities and previously removed
+      # entities cannot be registered as new objects in this session.
       def add(entity)
         active!
         mapping = @mappings.fetch(entity.class)
@@ -88,6 +94,9 @@ module ObjectFramework
         entity
       end
 
+      # Finds a mapped entity by identity or raises NotFound. Repeated lookups
+      # return the same object. +load+ explicitly selects associations, with
+      # nested hashes for nested loading; no implicit lazy loading occurs.
       def find(type, id, load: [])
         active!
         raise NotFound, "Entity was removed" if @removed.key?([type, id])
@@ -102,6 +111,8 @@ module ObjectFramework
         entity
       end
 
+      # Returns managed entities matching an immutable Query and optional
+      # association loading plan. Removed identities are excluded.
       def query(type, query = Query.new, load: [])
         active!
         mapping = @mappings.fetch(type)
@@ -112,6 +123,7 @@ module ObjectFramework
         end
       end
 
+      # Schedules deletion of a managed entity, or discards a pending insert.
       def remove(entity)
         active!
         id = @work.entry(entity).identity
@@ -120,6 +132,8 @@ module ObjectFramework
         @identities.remove(entity.class, id)
       end
 
+      # Writes tracked inserts, changes, and deletions without committing.
+      # Managed identities cannot change. Requires an active session.
       def flush
         active!
         @work.flush

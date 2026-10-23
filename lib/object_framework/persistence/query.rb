@@ -4,6 +4,10 @@ module ObjectFramework
   module Persistence
     Criterion = Data.define(:field, :operator, :value)
 
+    # Immutable query shared by storage adapters. Filters and ordering produce
+    # new queries; rows use +id+ as a deterministic final ordering key.
+    #
+    #   Query.new.where(status: "ready").order(:id).limit(20).offset(40)
     class Query
       OPERATORS = %i[eq ne gt gte lt lte in].freeze
       attr_reader :table, :criteria, :ordering, :row_limit, :row_offset
@@ -24,10 +28,13 @@ module ObjectFramework
         copy(table:)
       end
 
+      # Adds equality criteria for every supplied field. Returns a new query.
       def where(**attributes)
         attributes.reduce(self) { |query, (field, value)| query.compare(field, :eq, value) }
       end
 
+      # Adds +:eq+, +:ne+, +:gt+, +:gte+, +:lt+, +:lte+, or +:in+.
+      # +:in+ requires an Array. Values are detached on construction.
       def compare(field, operator, value)
         raise ConfigurationError, "Unsupported query operator" unless OPERATORS.include?(operator)
         raise ConfigurationError, "IN requires an array" if operator == :in && !value.is_a?(Array)
@@ -35,15 +42,18 @@ module ObjectFramework
         copy(criteria: criteria + [criterion])
       end
 
+      # Appends an ascending or descending ordering using +:asc+ or +:desc+.
       def order(field, direction = :asc)
         raise ConfigurationError, "Invalid ordering direction" unless %i[asc desc].include?(direction)
         copy(ordering: ordering + [[self.class.identifier(field), direction].freeze])
       end
 
+      # Returns a query limited to a nonnegative integer number of rows.
       def limit(count)
         copy(row_limit: nonnegative(count))
       end
 
+      # Returns a query skipping a nonnegative integer number of rows.
       def offset(count)
         copy(row_offset: nonnegative(count))
       end

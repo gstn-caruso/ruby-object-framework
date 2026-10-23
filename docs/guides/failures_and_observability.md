@@ -10,7 +10,8 @@ representation of that failure, not the failure's identity.
 ## Register an exception before startup
 
 The order example defines `OrdersExample::OrderNotConfirmable` as an ordinary
-`StandardError` subclass. Its composition root declares the public meaning:
+`StandardError` subclass. Its composition root declares the public meaning with
+[`ErrorRegistry#register`](api/ObjectFramework/ErrorRegistry.html#method-i-register):
 
 ```ruby
 app.errors.register(
@@ -25,7 +26,8 @@ The domain does not inherit from a framework exception. Registration belongs
 to application composition because that is where domain meaning meets the
 framework's public error vocabulary.
 
-Resolution selects the closest registered ancestor. A specialized rejection can
+[`ErrorRegistry#resolve`](api/ObjectFramework/ErrorRegistry.html#method-i-resolve)
+selects the closest registered ancestor. A specialized rejection can
 therefore have its own code while other errors use a parent registration.
 Duplicate classes and ambiguous public codes fail during configuration or
 startup. Registrations become stable when the application starts.
@@ -72,7 +74,8 @@ exception messages.
 
 ## Read a problem response
 
-HTTP errors use `application/problem+json`, following
+[`HTTP::ProblemPresenter`](api/ObjectFramework/HTTP/ProblemPresenter.html)
+formats errors as `application/problem+json`, following
 [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html). A rejected order has the
 following shape; occurrence identifiers vary on every interaction:
 
@@ -122,7 +125,9 @@ business key and a deliberate persistence design.
 
 ## Record one primary failure
 
-Supply a diagnostic sink when constructing the application:
+Supply a diagnostic sink to
+[`FailureReporter`](api/ObjectFramework/FailureReporter.html) when constructing
+the application:
 
 ```ruby
 errors = ObjectFramework::ErrorRegistry.new
@@ -146,7 +151,8 @@ exception being reported.
 
 ## Cooperate with cancellation
 
-An explicit cancellation object belongs to the interaction. The invocation
+An explicit [`Cancellation`](api/ObjectFramework/Cancellation.html) object
+belongs to the interaction. The invocation
 checks it before work and before commit; long-running use cases should check it
 between bounded steps. Cancellation before commit rolls back. Cancellation
 after commit preserves confirmed effects.

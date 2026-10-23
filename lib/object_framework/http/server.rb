@@ -13,9 +13,17 @@ module ObjectFramework
       end
     end
 
+    # Application lifecycle module serving HTTP/1.1 on a dispatcher and one new
+    # thread per admitted request. Keep-alive requests execute sequentially.
+    # Install with Application#install before startup; the application owns
+    # listener startup, cooperative shutdown, and controller validation.
     class Server
       attr_reader :port, :name
 
+      # Configures admission limits and timeouts in seconds. +port+ zero lets
+      # the OS assign a port, available through #port after startup.
+      # +tls_context+ is an optional OpenSSL context with application-provided
+      # certificate and private key. Execution cancellation is cooperative.
       def initialize(application:, router:, host: "127.0.0.1", port: 0, name: :http,
                      parser: Parser.new, presenter: JSONPresenter.new, problem_presenter: nil,
                      max_requests: 128, max_connections: 1024, header_timeout: 10,
