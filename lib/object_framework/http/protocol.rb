@@ -120,6 +120,8 @@ module ObjectFramework
           body << reader.read_exact(count, deadline:)
           raise BadRequest unless reader.read_exact(2, deadline:) == "\r\n"
         end
+      rescue EOFError
+        raise BadRequest
       end
 
       private

@@ -41,9 +41,18 @@ module ObjectFramework
       @mutex.synchronize { @cancelled = true }
     end
 
+    def deadline
+      @mutex.synchronize { @deadline }
+    end
+
+    def deadline=(deadline)
+      @mutex.synchronize { @deadline = deadline }
+    end
+
     def check!
       raise Cancelled, "Operation cancelled" if @mutex.synchronize { @cancelled }
-      raise DeadlineExceeded, "Deadline exceeded" if @deadline && @clock.call >= @deadline
+      limit = deadline
+      raise DeadlineExceeded, "Deadline exceeded" if limit && @clock.call >= limit
     end
   end
 

@@ -13,6 +13,8 @@ require_relative "object_framework/memory/storage"
 require_relative "object_framework/http/protocol"
 require_relative "object_framework/http/router"
 require_relative "object_framework/http/presentation"
+require_relative "object_framework/http/io"
+require_relative "object_framework/http/server"
 
 module ObjectFramework
   VERSION = "0.1.0"
