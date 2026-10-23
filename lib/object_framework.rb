@@ -18,6 +18,9 @@ require_relative "object_framework/http/server"
 require_relative "object_framework/protobuf"
 require_relative "object_framework/grpc/service"
 require_relative "object_framework/http2/hpack"
+require_relative "object_framework/http2/frame"
+require_relative "object_framework/http2/inbound"
+require_relative "object_framework/grpc/messages"
 
 module ObjectFramework
   VERSION = "0.1.0"
