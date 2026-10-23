@@ -138,3 +138,28 @@ Spec.test "public values are detached and immutable before resources are closed"
 ensure
   app&.stop
 end
+
+Spec.test "every module validates before any module starts listening" do
+  events = []
+  mod = Class.new do
+    attr_reader :name
+    def initialize(name, events); @name, @events = name, events; end
+    def requires; []; end
+    def configure(app); end
+    def validate!; raise ObjectFramework::ConfigurationError, "Invalid routes" if @name == :invalid; end
+    def start; @events << :listening; end
+    def stop; @events << :stopped; end
+  end
+  app = ObjectFramework::Application.new
+  app.install(mod.new(:listener, events))
+  app.install(mod.new(:invalid, events))
+  assert_raises(ObjectFramework::ConfigurationError) { app.start }
+  assert_equal [], events
+end
+
+Spec.test "reserved execution dependencies cannot be shadowed by factories" do
+  %i[context session transaction].each do |name|
+    app = ObjectFramework::Application.new
+    assert_raises(ObjectFramework::ConfigurationError) { app.factory(name) { Object.new } }
+  end
+end

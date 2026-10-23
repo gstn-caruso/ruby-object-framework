@@ -16,6 +16,7 @@ module ObjectFramework
 
     def factory(name, dependencies: [], close: false, &build)
       mutable!
+      raise ConfigurationError, "Reserved execution dependency: #{name}" if %i[context session transaction].include?(name)
       raise ConfigurationError, "Factory #{name} already registered" if @factories.key?(name)
       raise ConfigurationError, "Factory requires a block" unless build
       @factories[name] = Factory.new(dependencies: dependencies.dup.freeze, build:, close:)
@@ -43,6 +44,7 @@ module ObjectFramework
         modules = ordered_modules
         modules.each { |mod| mod.configure(self) }
         validate!
+        modules.each { |mod| mod.validate! if mod.respond_to?(:validate!) }
         @factories.freeze
         @operations.freeze
         @modules.freeze
