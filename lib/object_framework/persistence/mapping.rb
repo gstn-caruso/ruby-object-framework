@@ -89,7 +89,7 @@ module ObjectFramework
             baseline[association.foreign_key]
           end
         end
-        Values.detach(row)
+        Values.detach(baseline ? baseline.merge(row) : row)
       end
 
       def finalize!

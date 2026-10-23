@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="<%= h(guide ? guide.summary : 'Progressive guides to building Ruby applications from collaborating objects.') %>">
+  <title><%= guide ? "#{h(guide.title)} · " : '' %>ObjectFramework Guides</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="icon" href="assets/objects.svg" type="image/svg+xml">
+  <script src="assets/guides.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><img src="assets/objects.svg" width="34" height="34" alt=""><span>ObjectFramework <b>Guides</b></span></a>
+      <nav aria-label="Project"><a href="<%= h(@repository) %>">Source on GitHub</a><span>Ruby 4.0.8</span></nav>
+    </div>
+  </header>
+  <div class="book-layout <%= guide ? 'article-layout' : 'index-layout' %>">
+    <aside class="learning-path">
+      <details class="path-disclosure" open>
+        <summary>Learning path</summary>
+        <nav aria-label="Guides">
+          <label class="search-label" for="guide-search">Find a guide</label>
+          <input id="guide-search" type="search" placeholder="Topic or guide title" autocomplete="off">
+          <ol class="chapter-list">
+            <% @guides.each do |item| -%>
+              <li data-guide="<%= h("#{item.title} #{item.summary}".downcase) %>"><a href="<%= item.slug %>.html" <%= guide == item ? 'aria-current="page"' : '' %>><%= h(item.title) %></a></li>
+            <% end -%>
+          </ol>
+          <p class="search-status" aria-live="polite"></p>
+        </nav>
+      </details>
+      <p class="edition">Framework 0.1.0<br>From first use case to streaming</p>
+    </aside>
+    <main id="main" tabindex="-1">
+      <% if guide -%>
+        <p class="breadcrumb"><a href="index.html">All guides</a> / <%= h(guide.section) %></p>
+        <h1><%= h(guide.title) %></h1>
+        <p class="guide-summary"><%= h(guide.summary) %></p>
+        <details class="mobile-contents"><summary>On this page</summary><ol><% headings.each do |heading| %><li><a href="#<%= heading[:id] %>"><%= h(heading[:text]) %></a></li><% end %></ol></details>
+        <article class="guide-body"><%= body %></article>
+        <nav class="pagination" aria-label="Continue reading">
+          <div><% if previous %><small>Previous guide</small><a href="<%= previous.slug %>.html"><%= h(previous.title) %></a><% end %></div>
+          <div><% if following %><small>Next guide</small><a href="<%= following.slug %>.html"><%= h(following.title) %></a><% end %></div>
+        </nav>
+        <p class="contribute">Found an unclear example or a missing explanation? <a href="<%= h(@repository) %>/blob/main/docs/guides/<%= guide.slug %>.md">Improve this guide</a>.</p>
+      <% else -%>
+        <%= body %>
+      <% end -%>
+    </main>
+    <% if guide -%>
+      <aside class="contents"><nav aria-label="On this page"><h2>On this page</h2><ol><% headings.each do |heading| %><li class="level-<%= heading[:level] %>"><a href="#<%= heading[:id] %>"><%= h(heading[:text]) %></a></li><% end %></ol></nav></aside>
+    <% end -%>
+  </div>
+  <footer class="site-footer"><p>ObjectFramework is an open-source Ruby framework. These guides explain its public APIs, the objects behind them, and their tradeoffs.</p><a href="<%= h(@repository) %>/blob/main/PLAN.md">Design and delivery plan</a><a href="#main">Back to content</a></footer>
+</body>
+</html>

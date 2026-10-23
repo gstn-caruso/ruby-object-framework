@@ -1,0 +1,18 @@
+<section class="introduction">
+  <h1>ObjectFramework Guides</h1>
+  <p class="guide-summary">Build an application, one collaboration at a time.</p>
+  <p>Start with a plain Ruby use case. Grow it into an order-confirmation application, give its objects a transaction, and expose the same intention through HTTP and gRPC.</p>
+  <p>Each guide includes runnable examples, failure cases, and the reasoning behind the design. Follow the learning path in order, or enter at the topic you need.</p>
+  <a class="start-reading" href="<%= @guides.first.slug %>.html">Start with your first application</a>
+</section>
+<div class="guide-index">
+  <% @guides.group_by(&:section).each do |section, entries| -%>
+    <section><h2><%= h(section) %></h2><dl>
+      <% entries.each do |entry| -%>
+        <dt><a href="<%= entry.slug %>.html"><%= h(entry.title) %></a></dt>
+        <dd><%= h(entry.summary) %></dd>
+      <% end -%>
+    </dl></section>
+  <% end -%>
+</div>
+<section class="reading-note"><h2>Read the code alongside the guides</h2><p>The examples are versioned with the framework and run in its test suite. When a guide shows a full example, its source link opens the exact program. Explanations also point to implementation tests, so you can follow a claim to executable evidence.</p><p>Ruby Box, Ractor, and JIT features are optional. The core framework runs on Ruby 4.0.8; SQLite is its sole optional runtime gem.</p></section>

@@ -1,0 +1,62 @@
+- file: 01_plain_use_case.rb
+  output: |
+    Hello, Ada
+- file: 02_composed_application.rb
+  output: |
+    Hello, Ada
+    Result is frozen: true
+- file: 03_order_domain.rb
+  output: |
+    confirmed
+    An order can only be confirmed once
+- file: 04_scoped_resources.rb
+  output: |
+    Same resource: true
+    opened, closed
+- file: 05_mapping.rb
+  output: |
+    UUID assigned: true
+    Same identity: true
+    Independent session: true
+    Stored state: pending
+- file: 06_associations.rb
+  output: |
+    Customer: Ada
+    Shared identity: true
+- file: 07_http.rb
+  output: |
+    HTTP 200
+    Order state: confirmed
+- file: 08_errors.rb
+  output: |
+    404 not_found
+    Occurrence ID present: true
+    409 order_not_confirmable
+    Occurrence ID present: true
+- file: 09_sqlite.rb
+  output: |
+    Schema version: 2
+    Read: pending
+    Write: confirmed
+    Unmapped note: gift
+    Open connections: 0
+- file: 10_grpc.rb
+  output: |
+    ready: confirmed
+- file: 11_ractor.rb
+  output: |
+    Total: 6
+    Request thread preserved: true
+- file: 12_box.rb
+  env:
+    RUBY_BOX: '1'
+  output: |
+    first application
+    second application
+    Definitions leaked: false
+- file: 13_testing.rb
+  output: |
+    PASS a zero price remains zero
+    PASS a price includes twenty percent tax
+    PASS negative prices are rejected
+    3 tests, 0 failures

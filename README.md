@@ -4,10 +4,14 @@ A modular Ruby framework for applications built from collaborating objects.
 Use cases are ordinary Ruby classes, dependencies are explicit, and each
 invocation owns its resources and transaction.
 
+Read the [ObjectFramework Guides](https://gstn-caruso.github.io/ruby-object-framework/)
+for progressive tutorials, executable examples, and the reasoning behind the
+framework's design. Start with [Your first application](https://gstn-caruso.github.io/ruby-object-framework/getting_started.html).
+
 Development follows the six deliveries in [PLAN.md](PLAN.md). See the
 [implementation record](IMPLEMENTATION.md) for the current delivery status.
-The framework is under development; completed delivery gates do not imply that
-the remaining transports and storage adapters are available yet.
+The initial implementation includes HTTP/1.1, native gRPC streaming, HashMap and
+SQLite persistence, and optional Ruby execution capabilities.
 
 ## Requirements and tests
 

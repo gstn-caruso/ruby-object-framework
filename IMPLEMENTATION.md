@@ -25,7 +25,10 @@ adapter may additionally depend on `sqlite3`; no other runtime gems are planned.
 The scope also includes the progressive English guides and published GitHub
 Pages site specified in section 6 of `PLAN.md`. Guide sources, executable
 examples, local build/preview commands, validation, deployment, and verification
-of the live site are required deliverables. This documentation work is pending.
+of the live site are required deliverables. Eleven guides and thirteen runnable
+examples have been implemented. The local site builds and validates links;
+desktop/mobile and keyboard review passed, with 55 passing Lighthouse checks
+on the inspected mobile guide. GitHub publication is pending.
 
 ## Verified delivery gates
 

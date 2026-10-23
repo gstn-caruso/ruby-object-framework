@@ -1,0 +1,44 @@
+- slug: getting_started
+  title: Your first application
+  summary: Start with a Ruby object, compose an application, and run a complete intention.
+  section: Foundations
+- slug: objects_and_responsibilities
+  title: Objects and responsibilities
+  summary: Build order confirmation and decide which object owns each business and application decision.
+  section: Foundations
+- slug: composition_and_execution
+  title: Composition and execution
+  summary: Give collaborators an execution scope, validate startup, and make resource ownership explicit.
+  section: Foundations
+- slug: data_mapper_and_sessions
+  title: Data Mapper and sessions
+  summary: Store independent values while preserving object identity and tracking changes inside a session.
+  section: Application data
+- slug: queries_and_associations
+  title: Queries and associations
+  summary: Compose queries, load explicit object graphs, and understand when changes become visible.
+  section: Application data
+- slug: http_apis
+  title: Building an HTTP API
+  summary: Turn an order-confirmation intention into a JSON endpoint with explicit input and response boundaries.
+  section: Transports and failures
+- slug: failures_and_observability
+  title: Failures and observability
+  summary: Translate meaningful exceptions safely and distinguish rollback from failures after commit.
+  section: Transports and failures
+- slug: sqlite_and_migrations
+  title: SQLite and schema evolution
+  summary: Replace volatile storage, evolve a database, and reason about locks, deadlines, and durable commits.
+  section: Beyond the first endpoint
+- slug: grpc_and_streaming
+  title: gRPC and streaming
+  summary: Export contracts, reuse the same use case, and keep streaming transactions bounded by messages.
+  section: Beyond the first endpoint
+- slug: concurrency_and_ruby
+  title: Concurrency and Ruby capabilities
+  summary: Follow ownership through request threads, flow control, cancellation, Ruby Box, Ractor, and JITs.
+  section: Beyond the first endpoint
+- slug: testing_and_extending
+  title: Testing and extending
+  summary: Make a change with TDD, follow the storage contract, and add modules without hidden dependencies.
+  section: Contributing
