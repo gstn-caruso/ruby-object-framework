@@ -76,7 +76,7 @@ test("releases keep the gem, main, lockfile, and tags aligned and do not repeat 
       branches: config.branches, tagFormat: config.tagFormat,
       repositoryUrl: pathToFileURL(remote).href, plugins,
     }));
-    git("init", "--bare", remote);
+    git("init", "--bare", "--initial-branch=main", remote);
     git("init", "--initial-branch=main");
     git("config", "user.name", "Release test");
     git("config", "user.email", "release@example.test");
