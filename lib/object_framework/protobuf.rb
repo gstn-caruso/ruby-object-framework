@@ -181,12 +181,12 @@ module ObjectFramework
 
       def default?(type, value)
         return value.nil? if type.is_a?(Message)
-        return value == 0 if type.is_a?(Enum)
+        return value.is_a?(Integer) && value.zero? if type.is_a?(Enum)
         case type
         when :string, :bytes then value == ""
         when :bool then value == false
         when :float, :double then value == 0 && !value.to_s.start_with?("-")
-        else value == 0
+        else value.is_a?(Integer) && value.zero?
         end
       end
 

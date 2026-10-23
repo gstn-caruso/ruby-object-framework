@@ -21,6 +21,8 @@ require_relative "object_framework/http2/hpack"
 require_relative "object_framework/http2/frame"
 require_relative "object_framework/http2/inbound"
 require_relative "object_framework/grpc/messages"
+require_relative "object_framework/http2/connection"
+require_relative "object_framework/grpc/server"
 
 module ObjectFramework
   VERSION = "0.1.0"

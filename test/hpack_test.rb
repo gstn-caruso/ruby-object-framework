@@ -33,3 +33,11 @@ Spec.test "HPACK handles table-size eviction, limits, malformed indices, and lit
   limited = ObjectFramework::HTTP2::HPACK::Decoder.new(header_limit: 40)
   assert_raises(ObjectFramework::HTTP2::CompressionError) { limited.decode(encoder.encode([["long-name", "x" * 50]])) }
 end
+
+Spec.test "HPACK dynamic entries are evicted when the peer reduces the table size" do
+  decoder = ObjectFramework::HTTP2::HPACK::Decoder.new
+  decoder.decode(["410161"].pack("H*"))
+  assert_equal [[":authority", "a"]], decoder.decode("\xbe".b)
+  assert_equal [], decoder.decode("\x20".b)
+  assert_raises(ObjectFramework::HTTP2::CompressionError) { decoder.decode("\xbe".b) }
+end

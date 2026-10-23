@@ -14,6 +14,13 @@ module ObjectFramework
     class CompressionError < ProtocolError
       def initialize(message = "Invalid HPACK block"); super(message, code: 9); end
     end
+    class StreamError < ProtocolError
+      attr_reader :stream_id
+      def initialize(stream_id, message = "Invalid HTTP/2 stream", code: 1)
+        super(message, code:)
+        @stream_id = stream_id
+      end
+    end
 
     module HPACK
       module Huffman

@@ -18,7 +18,7 @@ module ObjectFramework
   class ErrorRegistry
     CATEGORIES = %i[bad_request invalid_input unauthenticated forbidden not_found conflict
                     duplicate transaction_conflict rate_limited capacity unavailable
-                    deadline cancelled internal].freeze
+                    deadline cancelled unimplemented internal].freeze
     DEFAULTS = {
       InvalidInput => [:invalid_input, "invalid_input", "Invalid input"],
       NotFound => [:not_found, "not_found", "Resource not found"],

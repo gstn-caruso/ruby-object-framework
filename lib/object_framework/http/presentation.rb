@@ -26,7 +26,7 @@ module ObjectFramework
         bad_request: 400, invalid_input: 422, unauthenticated: 401, forbidden: 403,
         not_found: 404, conflict: 409, duplicate: 409, transaction_conflict: 409,
         rate_limited: 429, capacity: 503, unavailable: 503, deadline: 503,
-        cancelled: 503, internal: 500
+        cancelled: 503, unimplemented: 501, internal: 500
       }.freeze
 
       def initialize(registry:)

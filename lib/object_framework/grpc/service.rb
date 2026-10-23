@@ -8,7 +8,9 @@ module ObjectFramework
       attr_reader :name, :methods
 
       def initialize(name)
-        name.to_s.split(".").each { |part| Protobuf.name(part) }
+        parts = name.to_s.split(".", -1)
+        raise ConfigurationError, "Invalid service name" if parts.empty?
+        parts.each { |part| Protobuf.name(part) }
         @name, @methods = name.to_s.dup.freeze, {}
       end
 
@@ -21,12 +23,19 @@ module ObjectFramework
         self
       end
 
-      def finalize!; @methods.freeze; self; end
+      def finalize!
+        to_proto
+        @methods.freeze
+        freeze
+      end
 
       def to_proto
         definitions = {}
         visit = lambda do |type|
-          return if definitions.key?(type.name)
+          if definitions.key?(type.name)
+            raise ConfigurationError, "Ambiguous protobuf type name: #{type.name}" unless definitions[type.name].equal?(type)
+            return
+          end
           definitions[type.name] = type
           type.dependencies.each { |child| visit.call(child) } if type.is_a?(Protobuf::Message)
         end

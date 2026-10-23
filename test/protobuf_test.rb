@@ -54,3 +54,44 @@ Spec.test "Protocol Buffers export complete proto3 contracts from Ruby descripto
   assert proto.include?("string name = 1;")
   assert proto.include?("rpc Hello (Request) returns (Reply);")
 end
+
+Spec.test "Protocol Buffers agree with Google's codec for every scalar, enums, and nested repeated values" do
+  require "base64"
+  require "open3"
+  require "tmpdir"
+  state = ObjectFramework::Protobuf::Enum.new("State", UNKNOWN: 0, READY: 1)
+  nested = ObjectFramework::Protobuf::Message.new("Nested") { field :name, 1, :string }
+  values = {
+    int32_value: -(2**31), int64_value: -(2**63), uint32_value: 2**32 - 1,
+    uint64_value: 2**64 - 1, sint32_value: -123, sint64_value: -456,
+    fixed32_value: 2**32 - 1, fixed64_value: 2**64 - 1, sfixed32_value: -123,
+    sfixed64_value: -456, float_value: 1.5, double_value: -2.5, bool_value: true,
+    string_value: "Hello λ", bytes_value: "\x00\xff".b, state: 1,
+    values: [-1, 0, 1], nested: { name: "Ada" }
+  }
+  descriptor = ObjectFramework::Protobuf::Message.new("Everything") do
+    ObjectFramework::Protobuf::SCALARS.keys.each_with_index { |type, index| field "#{type}_value", index + 1, type }
+    field :state, 16, state
+    field :values, 17, :int32, repeated: true
+    field :nested, 18, nested
+  end
+  service = ObjectFramework::GRPC::Service.new("interop.Scalars")
+  service.rpc(:Echo, input: descriptor, output: descriptor, controller: :echo)
+  Dir.mktmpdir("object-framework-scalars") do |directory|
+    path = File.join(directory, "scalars.proto")
+    File.write(path, service.to_proto)
+    python = ENV.fetch("OBJECT_FRAMEWORK_INTEROP_PYTHON", File.expand_path("../.venv/bin/python", __dir__))
+    output, error, status = Open3.capture3(python, File.join(__dir__, "interop/protobuf_client.py"), path, Base64.strict_encode64(descriptor.encode(values)))
+    assert status.success?, error
+    assert_equal values, descriptor.decode(Base64.strict_decode64(JSON.parse(output).fetch("encoded")))
+  end
+end
+
+Spec.test "Protocol Buffers reject incorrect integer zero types and ambiguous exported contracts" do
+  first = ObjectFramework::Protobuf::Message.new("Same") { field :id, 1, :int32 }
+  second = ObjectFramework::Protobuf::Message.new("Same") { field :name, 1, :string }
+  assert_raises(ObjectFramework::InvalidInput) { first.encode(id: 0.0) }
+  service = ObjectFramework::GRPC::Service.new("interop.Ambiguous")
+  service.rpc(:Call, input: first, output: second, controller: :call)
+  assert_raises(ObjectFramework::ConfigurationError) { service.to_proto }
+end

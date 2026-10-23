@@ -18,6 +18,18 @@ The core and test runner use Ruby core and the standard library.
 ruby -Ilib:test test/run.rb
 ```
 
+For the full interoperability gate, prepare the independent Python clients:
+
+```sh
+bundle install
+python3 -m venv .venv
+.venv/bin/python -m pip install -r test/interop/requirements.txt
+ruby -Ilib:test test/run.rb
+```
+
+Python dependencies are test clients; the framework does not load them. Set
+`OBJECT_FRAMEWORK_INTEROP_PYTHON` to use an existing test environment.
+
 Pass test filenames to run selected scenarios:
 
 ```sh
@@ -147,3 +159,34 @@ Migrations run in a transaction and use SQLite's `user_version`. Startup rejects
 newer database versions and mismatched column declarations. DELETE journaling
 can delay a writer's commit while a reader remains active; keep invocations
 short. Call `storage.close` after stopping applications that use it.
+
+## gRPC
+
+Run the same order use case through HTTP and gRPC:
+
+```sh
+ruby -Ilib examples/orders/grpc_server.rb
+ruby -Ilib examples/orders/export_proto.rb > orders.proto
+```
+
+The gRPC service is `orders.Orders/ConfirmOrder`. The framework implements
+HTTP/2, HPACK, proto3 wire encoding, gRPC framing, and trailers in Ruby. Message
+and service descriptors are Ruby objects that export `.proto` contracts.
+Unary, server streaming, client streaming, and bidirectional calls each receive
+one new request thread. Streaming controllers invoke use cases per message or
+batch so that sessions and transactions finish before yielding public values.
+
+Requests default to a 1 MiB message limit, a 32 KiB header limit, 128 active RPCs,
+and 128 connections. Both connection and stream windows bound inbound buffering
+and outgoing DATA. Deadlines and `RST_STREAM` cancellation reach the explicit
+context. Responses carry `grpc-status`, a safe `grpc-message` when needed,
+`error-code`, and `operation-id`. Message compression currently uses identity.
+TLS accepts application certificates and negotiates `h2` through ALPN.
+
+Interop tests use Python grpcio, Google's generated protobuf codec, and
+hyper-h2. They cover every RPC mode, every scalar type, large messages, header
+continuations, error metadata, TLS, admission, deadlines, cancellation, and
+failure after a stream has produced values. Protocol references are
+[HTTP/2](https://www.rfc-editor.org/rfc/rfc9113.html),
+[HPACK](https://www.rfc-editor.org/rfc/rfc7541.html), and the
+[gRPC wire protocol](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md).

@@ -10,8 +10,8 @@ scenarios before work starts on the next delivery.
 | 2 | Data Mapper, queries, associations, snapshot HashMap storage | Passed: 35 cumulative scenarios on Ruby 4.0.8 |
 | 3 | HTTP/1.1 server, TLS, JSON, order confirmation example | Passed: 61 cumulative scenarios on Ruby 4.0.8 |
 | 4 | SQLite adapter, migrations, shared storage contract | Passed: 75 cumulative scenarios on Ruby 4.0.8 |
-| 5 | HTTP/2, HPACK, Protocol Buffers, gRPC and streaming interoperability | In progress |
-| 6 | Optional Ruby Box, Ractor, interpreter/YJIT/ZJIT comparison | Pending |
+| 5 | HTTP/2, HPACK, Protocol Buffers, gRPC and streaming interoperability | Passed: 93 cumulative scenarios on Ruby 4.0.8 |
+| 6 | Optional Ruby Box, Ractor, interpreter/YJIT/ZJIT comparison | In progress |
 
 ## Development
 
@@ -42,3 +42,10 @@ adapter may additionally depend on `sqlite3`; no other runtime gems are planned.
   writer. A separate HashMap scenario preserves the stronger concurrent-commit
   snapshot assertion. Tests also cover deadline-bounded locks, safe SQL binding,
   schema versions and shape validation, foreign keys, and per-invocation cleanup.
+- Delivery 5: `ruby -Ilib:test test/run.rb` — 93 tests, zero failures. The
+  independent clients are grpcio 1.84.1, Google's protobuf 7.36.2, and hyper-h2
+  4.4.1. Includes every streaming mode, all proto3 scalars, TLS with certificate
+  verification and h2 ALPN, 200 KiB messages, header continuations, isolated
+  stream errors, admission across connections, cancellation, and per-message
+  commits surviving a late stream error. RFC HPACK tables and their license are
+  documented in `THIRD_PARTY_NOTICES.md`.
