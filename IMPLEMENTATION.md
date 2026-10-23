@@ -62,6 +62,10 @@ keyboard disclosure/search, and 55 mobile Lighthouse checks locally.
 
 ## Verified delivery gates
 
+- Release fixture independence: `npm test` — 11 tests, zero failures. The
+  temporary checkout starts at a fixed development version so the initial
+  release scenario still verifies its version commit after this repository has
+  published releases.
 - Request-scoped beans: `ruby -Ilib:test test/run.rb` — 127 tests, zero
   failures on Ruby 4.0.8. `Application#bean` accepts ordinary classes or builder
   blocks, and beans and operations infer required keyword dependencies.

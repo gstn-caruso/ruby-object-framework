@@ -72,6 +72,10 @@ test("releases keep the gem, main, lockfile, and tags aligned and do not repeat 
     for (const path of ["lib", "ruby-object-framework.gemspec", "Gemfile", "Gemfile.lock", "tools/prepare_release.rb", ".ruby-version", ".tool-versions"]) {
       cpSync(join(root, path), join(cwd, path), { recursive: true });
     }
+    const versionFile = join(cwd, "lib/object_framework/version.rb");
+    writeFileSync(versionFile, readFileSync(versionFile, "utf8").replace(/VERSION = "[^"]+"/, 'VERSION = "0.1.0"'));
+    const lockfile = join(cwd, "Gemfile.lock");
+    writeFileSync(lockfile, readFileSync(lockfile, "utf8").replaceAll(/ruby-object-framework \([^)]+\)/g, "ruby-object-framework (0.1.0)"));
     writeFileSync(join(cwd, ".releaserc.json"), JSON.stringify({
       branches: config.branches, tagFormat: config.tagFormat,
       repositoryUrl: pathToFileURL(remote).href, plugins,
