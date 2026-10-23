@@ -26,9 +26,20 @@ The scope also includes the progressive English guides and published GitHub
 Pages site specified in section 6 of `PLAN.md`. Guide sources, executable
 examples, local build/preview commands, validation, deployment, and verification
 of the live site are required deliverables. Eleven guides and thirteen runnable
-examples have been implemented. The local site builds and validates links;
-desktop/mobile and keyboard review passed, with 55 passing Lighthouse checks
-on the inspected mobile guide. GitHub publication is pending.
+examples have been implemented. The complete suite passes 111 scenarios,
+including all executable guide programs. GitHub Actions verifies the framework,
+independent protocol clients, guide build, links, and anchors before deployment.
+The [published guides](https://gstn-caruso.github.io/ruby-object-framework/)
+are live on GitHub Pages.
+
+Publication was verified in
+[Actions run 39892939250](https://github.com/gstn-caruso/ruby-object-framework/actions/runs/39892939250).
+The live index, two guide pages, stylesheet, script, and collaboration diagram
+returned HTTP 200. Desktop/mobile and keyboard review passed; the published
+objects-and-responsibilities guide passed all 55 Lighthouse checks, scoring
+100 for accessibility, best practices, SEO, and agentic browsing. These checks
+cover the inspected page and do not measure performance or prove accessibility
+for every possible reader.
 
 ## Verified delivery gates
 
